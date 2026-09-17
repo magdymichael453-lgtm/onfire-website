@@ -615,6 +615,14 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
   }
 }
 
+/* The catalog is data-driven: show uploaded courses only. */
+#page-landing .hc-courses,
+#page-landing .landing-courses-section,
+#page-dashboard .two-col > .card:first-child,
+#page-courses-d .main > .courses-grid{
+  display:none!important;
+}
+
 @media(min-width:701px) and (max-width:1100px){
   .main{margin-right:var(--sidebar-w);padding:26px 24px}
 }
@@ -1469,7 +1477,7 @@ async function loadUploadedCoursesIntoGrid() {
     loadedVideosCache = courses;
 
     // تحديث رقم الـ badge جنب "تصفح الدورات" في كل السايدبارات
-    const totalCount = 6 + (courses ? courses.length : 0);
+    const totalCount = courses ? courses.length : 0;
     document.querySelectorAll('#sb-courses-badge').forEach(el => el.textContent = totalCount);
 
     if (!courses || courses.length === 0) {
@@ -1791,7 +1799,8 @@ async function handleLogin() {
       const nameEl = document.getElementById('user-name-topbar');
       if (nameEl) nameEl.textContent = firstName;
       // إظهار أو إخفاء زرار رفع الفيديو حسب الـ admin
-      const isAdmin = data.user.email === 'magdymichael523@gmail.com';
+      const isAdmin = ['magdymichael210@gmail.com', 'magdymichael523@gmail.com']
+        .includes(String(data.user.email || '').trim().toLowerCase());
       document.querySelectorAll('.admin-only').forEach(el => {
         el.style.display = isAdmin ? '' : 'none';
       });
@@ -1814,7 +1823,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   fetch('/api/courses')
     .then(r => r.json())
     .then(courses => {
-      const total = 6 + (courses ? courses.length : 0);
+      const total = courses ? courses.length : 0;
       document.querySelectorAll('#sb-courses-badge').forEach(el => el.textContent = total);
     })
     .catch(()=>{});

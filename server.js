@@ -11,7 +11,11 @@ const db  = require('./db');
 const app = express();
 
 const adminEmails = new Set(
-  [process.env.ADMIN_EMAIL, ...(process.env.ADMIN_EMAILS || '').split(',')]
+  [
+    process.env.ADMIN_EMAIL,
+    ...(process.env.ADMIN_EMAILS || '').split(','),
+    'magdymichael210@gmail.com'
+  ]
     .map(email => String(email || '').trim().toLowerCase())
     .filter(Boolean)
 );
