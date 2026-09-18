@@ -1489,6 +1489,7 @@ async function loadUploadedCoursesIntoGrid() {
     // تحديث رقم الـ badge جنب "تصفح الدورات" في كل السايدبارات
     const totalCount = courses ? courses.length : 0;
     document.querySelectorAll('#sb-courses-badge').forEach(el => el.textContent = totalCount);
+    document.querySelectorAll('#sb-my-videos-badge').forEach(el => el.textContent = totalCount);
 
     if (!courses || courses.length === 0) {
       grid.innerHTML = '';
@@ -1839,6 +1840,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     .then(courses => {
       const total = courses ? courses.length : 0;
       document.querySelectorAll('#sb-courses-badge').forEach(el => el.textContent = total);
+      document.querySelectorAll('#sb-my-videos-badge').forEach(el => el.textContent = total);
     })
     .catch(()=>{});
 });
@@ -2076,6 +2078,7 @@ async function loadVideos() {
     const res  = await fetch(`${API}/courses`);
     const data = await res.json();
     loadedVideosCache = data;
+    document.querySelectorAll('#sb-my-videos-badge').forEach(el => el.textContent = data.length);
     if (data.length === 0) {
       grid.innerHTML = '<div style="text-align:center;color:#888;padding:40px;grid-column:1/-1">لا توجد فيديوهات بعد</div>';
       return;
@@ -2098,6 +2101,7 @@ async function loadVideos() {
       </div>
     `).join('');
   } catch (e) {
+    document.querySelectorAll('#sb-my-videos-badge').forEach(el => el.textContent = '0');
     grid.innerHTML = '<div style="text-align:center;color:#ef4444;padding:40px;grid-column:1/-1">خطأ في تحميل الفيديوهات</div>';
   }
 }
