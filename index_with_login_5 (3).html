@@ -1191,7 +1191,14 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
             </div>
             <div class="up-field">
               <div class="up-label">اسم المدرس <span class="req">*</span></div>
-              <input class="up-input" id="up-teacher" type="text" placeholder="اكتب اسم المدرس" oninput="updateInfoCard()">
+              <select class="up-input" id="up-teacher" onchange="updateInfoCard()">
+                <option value="">اختر اسم المدرس</option>
+                <option value="محمد فهمي">محمد فهمي</option>
+                <option value="سلمى جمعة">سلمى جمعة</option>
+                <option value="بيتر رضا">بيتر رضا</option>
+                <option value="إبراهيم الدوسري">إبراهيم الدوسري</option>
+                <option value="علاء الجالي">علاء الجالي</option>
+              </select>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
               <div class="up-field" style="margin-bottom:0">
