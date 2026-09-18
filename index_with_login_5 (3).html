@@ -1840,6 +1840,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const staticPrice = document.querySelector('#page-payment-d .plan-price-big');
   if (staticPrice) staticPrice.textContent = '٢٩٩ جنيه مصري / سنوياً';
   updatePaymentSummary();
+  verifyStripeReturn();
   document.querySelectorAll('.t-lang').forEach(btn=>{
     btn.addEventListener('click', toggleLang);
   });
@@ -2167,8 +2168,50 @@ function openCoursePayment(course) {
   setActiveByPage('page-payment-d');
 }
 
-function completePayment() {
-  showPage('page-success-d');
+async function completePayment() {
+  if (!pendingCourse || !pendingCourse.id) {
+    alert('اختر فيديو أولاً قبل الدفع');
+    return;
+  }
+  const button = document.querySelector('#page-payment-d .pay-final-btn');
+  const originalText = button ? button.textContent : '';
+  if (button) { button.disabled = true; button.textContent = 'جاري فتح بوابة الدفع...'; }
+  try {
+    const token = localStorage.getItem('token');
+    const coupon = document.querySelector('#page-payment-d .coupon-in')?.value || '';
+    const res = await fetch(`${API}/payments/stripe/checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token || ''}` },
+      body: JSON.stringify({ courseId: pendingCourse.id, coupon })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.url) throw new Error(data.message || 'تعذر فتح بوابة الدفع');
+    window.location.href = data.url;
+  } catch (err) {
+    alert(err.message);
+    if (button) { button.disabled = false; button.textContent = originalText || 'إتمام عملية الدفع'; }
+  }
+}
+
+async function verifyStripeReturn() {
+  const params = new URLSearchParams(window.location.search);
+  const sessionId = params.get('session_id');
+  if (params.get('payment') !== 'success' || !sessionId) return;
+  try {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API}/payments/stripe/session/${encodeURIComponent(sessionId)}`, {
+      headers: { Authorization: `Bearer ${token || ''}` }
+    });
+    const result = await res.json();
+    if (!res.ok || !result.paid) throw new Error('لم يتم تأكيد الدفع');
+    const courses = await (await fetch(`${API}/courses`)).json();
+    pendingCourse = courses.find(course => String(course.id) === String(result.courseId)) || null;
+    paymentUnlocked = true;
+    showPage('page-success-d');
+  } catch (err) {
+    alert(err.message);
+    showPage('page-payment-d');
+  }
 }
 
 function continueAfterPayment() {
