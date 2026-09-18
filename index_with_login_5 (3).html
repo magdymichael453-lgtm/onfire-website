@@ -1570,7 +1570,7 @@ const translations = {
     'pay-title':'صفحة الدفع','pay-subtitle':'اشترك الآن وابدأ رحلتك التعليمية',
     'pay-details':'تفاصيل الاشتراك','plan-name':'باقة التميز الأكاديمي',
     'plan-desc':'وصول كامل لجميع المحاضرات والمصادر التعليمية',
-    'plan-price':'٢٩٩ ر.س / سنوياً','coupon-ph':'أدخل كود الخصم','apply-btn':'تطبيق',
+    'plan-price':'٢٩٩ جنيه مصري / سنوياً','coupon-ph':'أدخل كود الخصم','apply-btn':'تطبيق',
     'pay-method':'طريقة الدفع','pay-mada':'مدى (Mada)',
     'pay-visa':'البطاقات البنكية (Visa/Mastercard)','pay-apple':'Apple Pay',
     'sum-title':'ملخص السعر','sum-sub':'المجموع الفرعي','sum-disc':'الخصم',
@@ -1622,7 +1622,7 @@ const translations = {
     'pay-title':'Payment','pay-subtitle':'Subscribe now and start your learning journey',
     'pay-details':'Subscription Details','plan-name':'Academic Excellence Package',
     'plan-desc':'Full access to all lectures and educational resources',
-    'plan-price':'299 SAR / Year','coupon-ph':'Enter discount code','apply-btn':'Apply',
+    'plan-price':'299 EGP / Year','coupon-ph':'Enter discount code','apply-btn':'Apply',
     'pay-method':'Payment Method','pay-mada':'Mada',
     'pay-visa':'Bank Cards (Visa/Mastercard)','pay-apple':'Apple Pay',
     'sum-title':'Price Summary','sum-sub':'Subtotal','sum-disc':'Discount',
@@ -1831,6 +1831,15 @@ async function handleLogin() {
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
+  const paymentButton = document.querySelector('#page-payment-d .pay-final-btn');
+  if (paymentButton) paymentButton.onclick = completePayment;
+  const continueButton = document.querySelector('#page-success-d .btn-suc.primary');
+  if (continueButton) continueButton.onclick = continueAfterPayment;
+  const couponButton = document.querySelector('#page-payment-d .apply-btn-d');
+  if (couponButton) couponButton.onclick = applyPaymentCoupon;
+  const staticPrice = document.querySelector('#page-payment-d .plan-price-big');
+  if (staticPrice) staticPrice.textContent = '٢٩٩ جنيه مصري / سنوياً';
+  updatePaymentSummary();
   document.querySelectorAll('.t-lang').forEach(btn=>{
     btn.addEventListener('click', toggleLang);
   });
@@ -2106,9 +2115,80 @@ async function loadVideos() {
   }
 }
 
+let pendingCourse = null;
+let paymentUnlocked = false;
+let paymentDiscount = 0;
+
+function updatePaymentSummary() {
+  const price = 299;
+  const discount = price * paymentDiscount;
+  const subtotal = price - discount;
+  const tax = subtotal * 0.15;
+  const subtotalEl = document.querySelector('#page-payment-d .summary-card .sum-row:nth-child(2) .sv');
+  const discountEl = document.querySelector('#page-payment-d .summary-card .sum-row:nth-child(3) .disc');
+  const taxEl = document.querySelector('#page-payment-d .summary-card .sum-row:nth-child(4) .sv');
+  const totalEl = document.querySelector('#page-payment-d .summary-card .tv');
+  if (subtotalEl) subtotalEl.textContent = `${subtotal.toFixed(2)} جنيه مصري`;
+  if (discountEl) discountEl.textContent = `${discount.toFixed(2)} - جنيه مصري`;
+  if (taxEl) taxEl.textContent = `${tax.toFixed(2)} جنيه مصري`;
+  if (totalEl) totalEl.textContent = `${(subtotal + tax).toFixed(2)} جنيه مصري`;
+}
+
+function applyPaymentCoupon() {
+  const input = document.querySelector('#page-payment-d .coupon-in');
+  const code = String(input?.value || '').trim().toUpperCase();
+  paymentDiscount = code === 'ONFIRE10' ? 0.10 : 0;
+  if (input) {
+    input.style.borderColor = paymentDiscount ? '#16a34a' : (code ? '#ef4444' : 'var(--border)');
+    input.title = paymentDiscount ? 'تم تطبيق خصم ١٠٪' : (code ? 'كود الخصم غير صحيح' : '');
+  }
+  updatePaymentSummary();
+}
+
+function openCoursePayment(course) {
+  pendingCourse = course || null;
+  const price = 299;
+  const titleEl = document.querySelector('#page-payment-d .plan-name-big');
+  const descEl = document.querySelector('#page-payment-d .plan-desc-s');
+  const priceEl = document.querySelector('#page-payment-d .plan-price-big');
+  const subtotalEl = document.querySelector('#page-payment-d .summary-card .sum-row:nth-child(2) .sv');
+  const taxEl = document.querySelector('#page-payment-d .summary-card .sum-row:nth-child(4) .sv');
+  const totalEl = document.querySelector('#page-payment-d .summary-card .tv');
+  const title = course && course.title ? course.title : 'الفيديو التعليمي';
+  const tax = price * 0.15;
+  if (titleEl) titleEl.textContent = `اشتراك الفيديو: ${title}`;
+  if (descEl) descEl.textContent = 'ادفع الاشتراك للوصول إلى هذا الفيديو وجميع الملفات التعليمية المرتبطة به';
+  if (priceEl) priceEl.textContent = `${price} جنيه مصري / سنوياً`;
+  paymentDiscount = 0;
+  const couponInput = document.querySelector('#page-payment-d .coupon-in');
+  if (couponInput) { couponInput.value = ''; couponInput.style.borderColor = 'var(--border)'; }
+  updatePaymentSummary();
+  showPage('page-payment-d');
+  setActiveByPage('page-payment-d');
+}
+
+function completePayment() {
+  showPage('page-success-d');
+}
+
+function continueAfterPayment() {
+  if (pendingCourse) {
+    const course = pendingCourse;
+    paymentUnlocked = true;
+    playVideo(course.video_filename, course.title, course);
+    return;
+  }
+  showPage('page-dashboard');
+}
+
 // ─── Play Video → Open Lesson Page ─────────────────────────────
 function playVideo(filename, title, course) {
   // course param optional (full course object) for richer info
+  if (course && !paymentUnlocked) {
+    openCoursePayment(course);
+    return;
+  }
+  paymentUnlocked = false;
   const player = document.getElementById('lesson-video-player');
   const empty  = document.getElementById('lesson-video-empty');
   if (player) {
