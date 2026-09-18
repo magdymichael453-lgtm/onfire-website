@@ -960,8 +960,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
           </div>
           <div class="card">
             <div class="card-title"><svg class="lucide" viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg> <span data-i18n="attachments-title">المرفقات التعليمية</span></div>
-            <div class="ls-resource"><div class="ls-res-icon pdf"><svg class="lucide" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><div><div class="ls-res-name" data-i18n="res1-name">ملخص الدرس.pdf</div><div class="ls-res-size">MB 2.4</div></div><div class="ls-dl"><svg class="lucide" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div></div>
-            <div class="ls-resource"><div class="ls-res-icon doc"><svg class="lucide" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><div><div class="ls-res-name" data-i18n="res2-name">تمارين إضافية.pdf</div><div class="ls-res-size">MB 1.1</div></div><div class="ls-dl"><svg class="lucide" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div></div>
+            <div id="lesson-attachments-list"><div style="text-align:center;color:#aaa;font-size:13px;padding:20px 0">لا توجد مرفقات لهذا الفيديو</div></div>
           </div>
           <div class="next-card">
             <div class="next-label" data-i18n="next-lesson">الدرس التالي</div>
@@ -1453,7 +1452,14 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
 
 <script>
 /* ── Navigation ── */
-function showPage(id){
+function showPage(id, { fromHistory = false } = {}){
+  if (id === 'page-lesson-d' && !document.getElementById('lesson-video-player')?.src) {
+    showPage('page-courses-d', { fromHistory });
+    return;
+  }
+  if (!fromHistory && document.querySelector('.page.active')?.id !== id) {
+    history.pushState({ page: id }, '', id === 'page-landing' ? '#home' : `#${id}`);
+  }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
@@ -1466,6 +1472,9 @@ function showPage(id){
     loadUploadedCoursesIntoGrid();
   }
 }
+
+// Any browser-back action inside the single-page app returns to the home page.
+window.addEventListener('popstate', () => showPage('page-landing', { fromHistory: true }));
 
 // ─── عرض الفيديوهات المرفوعة في صفحة "تصفح الدورات" — متاحة لأي مستخدم بأي إيميل ───
 async function loadUploadedCoursesIntoGrid() {
@@ -2113,6 +2122,7 @@ function playVideo(filename, title, course) {
       subjBadge.innerHTML = (course.subject_emoji ? subjectIcon(course.subject_emoji) + ' ' : '') + course.subject;
       if (course.subject_color) subjBadge.style.background = course.subject_color;
     }
+    loadLessonAttachments(course.id);
   }
 
   showPage('page-lesson-d');
@@ -2125,6 +2135,34 @@ function playVideo(filename, title, course) {
 
   // Load / refresh playlist and highlight current video
   loadPlaylist(filename);
+}
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  }[char]));
+}
+
+async function loadLessonAttachments(courseId) {
+  const list = document.getElementById('lesson-attachments-list');
+  if (!list) return;
+  list.innerHTML = '<div style="text-align:center;color:#aaa;font-size:13px;padding:20px 0">جاري تحميل الملفات...</div>';
+  try {
+    const res = await fetch(`${API}/courses/${courseId}/attachments`);
+    const files = await res.json();
+    if (!Array.isArray(files) || files.length === 0) {
+      list.innerHTML = '<div style="text-align:center;color:#aaa;font-size:13px;padding:20px 0">لا توجد مرفقات لهذا الفيديو</div>';
+      return;
+    }
+    list.innerHTML = files.map(file => `
+      <a class="ls-resource" href="${file.url}" download="${escapeHtml(file.original_name)}" target="_blank" rel="noopener">
+        <div class="ls-res-icon doc"><svg class="lucide" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+        <div><div class="ls-res-name">${escapeHtml(file.original_name)}</div><div class="ls-res-size">${(Number(file.file_size || 0) / (1024 * 1024)).toFixed(1)} MB</div></div>
+        <div class="ls-dl"><svg class="lucide" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+      </a>`).join('');
+  } catch (error) {
+    list.innerHTML = '<div style="text-align:center;color:#ef4444;font-size:13px;padding:20px 0">تعذر تحميل الملفات</div>';
+  }
 }
 
 // ─── Playlist in lesson page ───────────────────────────────────
