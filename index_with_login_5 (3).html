@@ -74,6 +74,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
 .t-btn-primary{background:var(--navy);color:var(--white);border:none;border-radius:9px;padding:9px 20px;font-size:14px;font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer;transition:background .2s}
 .t-btn-primary:hover{background:var(--navy2)}
 .t-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--navy3));color:white;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;cursor:pointer}
+.t-avatar .lucide{width:18px;height:18px;stroke:currentColor;}
 .t-lang{border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:13px;color:var(--muted);cursor:pointer;background:none;font-family:'Tajawal',sans-serif}
 .t-notif{position:relative;cursor:pointer;font-size:20px;color:var(--muted)}
 .t-notif-dot{position:absolute;top:0;left:0;width:8px;height:8px;background:var(--orange);border-radius:50%;border:2px solid white}
@@ -761,7 +762,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
       <div class="sb-item" onclick="setActive(this);showPage('page-courses-d')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span data-i18n="sb-courses">تصفح الدورات</span><span class="sb-badge" id="sb-courses-badge">6</span></div>
       <div class="sb-item admin-only" style="display:none" onclick="setActive(this);showPage('page-upload')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>رفع فيديو</div>
       <div class="sb-item admin-only" style="display:none" onclick="setActive(this);showPage('page-my-videos');loadVideos()"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></span>فيديوهاتي</div>
-      <div class="sb-item" onclick="setActive(this);showPage('page-lesson-d')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></span><span data-i18n="sb-mylessons">دروسي</span><span class="sb-badge">3</span></div>
+      <div class="sb-item" onclick="setActive(this);showPage('page-my-videos');loadVideos()"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></span><span data-i18n="sb-mylessons">فيديوهاتي</span><span class="sb-badge" id="sb-my-videos-badge">0</span></div>
       <div class="sb-divider"></div>
       <div class="sb-section" data-i18n="sb-account">الحساب</div>
       <div class="sb-item" onclick="setActive(this);showPage('page-payment-d')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg></span><span data-i18n="sb-subscription">الاشتراك</span></div>
@@ -847,7 +848,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
       <div class="sb-section" data-i18n="sb-main">القائمة الرئيسية</div>
       <div class="sb-item" onclick="setActive(this);showPage('page-dashboard')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span><span data-i18n="sb-dashboard">لوحة التحكم</span></div>
       <div class="sb-item active" onclick="setActive(this)"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span data-i18n="sb-courses">تصفح الدورات</span><span class="sb-badge" id="sb-courses-badge">6</span></div>
-      <div class="sb-item" onclick="setActive(this);showPage('page-lesson-d')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></span><span data-i18n="sb-mylessons">دروسي</span><span class="sb-badge">3</span></div>
+      <div class="sb-item" onclick="setActive(this);showPage('page-my-videos');loadVideos()"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></span><span data-i18n="sb-mylessons">فيديوهاتي</span><span class="sb-badge">0</span></div>
       <div class="sb-divider"></div>
       <div class="sb-section" data-i18n="sb-account">الحساب</div>
       <div class="sb-item" onclick="setActive(this);showPage('page-payment-d')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg></span><span data-i18n="sb-subscription">الاشتراك</span></div>
@@ -987,7 +988,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
       <div class="sb-section" data-i18n="sb-main">القائمة الرئيسية</div>
       <div class="sb-item" onclick="setActive(this);showPage('page-dashboard')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span><span data-i18n="sb-dashboard">لوحة التحكم</span></div>
       <div class="sb-item" onclick="setActive(this);showPage('page-courses-d')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span data-i18n="sb-courses">تصفح الدورات</span><span class="sb-badge" id="sb-courses-badge">6</span></div>
-      <div class="sb-item" onclick="setActive(this);showPage('page-lesson-d')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></span><span data-i18n="sb-mylessons">دروسي</span><span class="sb-badge">3</span></div>
+      <div class="sb-item" onclick="setActive(this);showPage('page-my-videos');loadVideos()"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></span><span data-i18n="sb-mylessons">فيديوهاتي</span><span class="sb-badge">0</span></div>
       <div class="sb-divider"></div>
       <div class="sb-section" data-i18n="sb-account">الحساب</div>
       <div class="sb-item active" onclick="setActive(this)"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg></span><span data-i18n="sb-subscription">الاشتراك</span></div>
@@ -1802,8 +1803,12 @@ async function handleLogin() {
       const welcomeEl = document.getElementById('dash-welcome');
       if (welcomeEl) welcomeEl.innerHTML = 'مرحباً، ' + firstName + ' <svg class="lucide" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-3px"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>';
       // تحديث الأيقونة بأول حرف من الاسم
-      const avatarEl = document.getElementById('user-avatar');
-      if (avatarEl) avatarEl.textContent = data.user.full_name.charAt(0).toUpperCase();
+      const emailIcon = '<svg class="lucide" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-10 6L2 7"/></svg>';
+      document.querySelectorAll('.t-avatar').forEach(avatar => {
+        avatar.innerHTML = emailIcon;
+        avatar.title = data.user.email;
+        avatar.setAttribute('aria-label', data.user.email);
+      });
       // تحديث الاسم في الـ topbar
       const nameEl = document.getElementById('user-name-topbar');
       if (nameEl) nameEl.textContent = firstName;
