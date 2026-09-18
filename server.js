@@ -206,6 +206,67 @@ app.get('/api/auth/can-upload', verifyToken, (req, res) => {
   });
 });
 
+// ─── Stripe Checkout ─────────────────────────────────────────
+async function stripeRequest(endpoint, options = {}) {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error('STRIPE_SECRET_KEY غير موجود في متغيرات Railway');
+  const response = await fetch(`https://api.stripe.com/v1/${endpoint}`, {
+    method: options.method || 'GET',
+    headers: {
+      Authorization: `Bearer ${key}`,
+      ...(options.body ? { 'Content-Type': 'application/x-www-form-urlencoded' } : {})
+    },
+    body: options.body
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data?.error?.message || 'تعذر الاتصال بـ Stripe');
+  return data;
+}
+
+app.post('/api/payments/stripe/checkout', verifyToken, async (req, res) => {
+  try {
+    const courseId = Number(req.body?.courseId);
+    const coupon = String(req.body?.coupon || '').trim().toUpperCase();
+    let rows = [];
+    if (Number.isInteger(courseId)) {
+      [rows] = await db.query('SELECT id, title FROM courses WHERE id = ?', [courseId]);
+      if (!rows.length) return res.status(404).json({ message: 'الفيديو غير موجود' });
+    }
+
+    const baseAmount = 29900; // 299 EGP in piastres
+    const discount = coupon === 'ONFIRE10' ? 0.10 : 0;
+    const amount = Math.round(baseAmount * (1 - discount));
+    const origin = process.env.PUBLIC_URL || `${req.headers['x-forwarded-proto'] || req.protocol}://${req.get('host')}`;
+    const form = new URLSearchParams();
+    form.set('mode', 'payment');
+    form.set('success_url', `${origin}/?payment=success&course_id=${courseId}&session_id={CHECKOUT_SESSION_ID}#page-success-d`);
+    form.set('cancel_url', `${origin}/#page-payment-d`);
+    form.set('line_items[0][price_data][currency]', 'egp');
+    form.set('line_items[0][price_data][product_data][name]', rows[0] ? `اشتراك فيديو: ${rows[0].title}` : 'اشتراك On Fire الأكاديمي');
+    form.set('line_items[0][price_data][unit_amount]', String(amount));
+    form.set('line_items[0][quantity]', '1');
+    if (Number.isInteger(courseId)) form.set('metadata[course_id]', String(courseId));
+    form.set('metadata[user_id]', String(req.user.id));
+    form.set('metadata[coupon]', coupon);
+
+    const session = await stripeRequest('checkout/sessions', { method: 'POST', body: form.toString() });
+    res.json({ ok: true, url: session.url, sessionId: session.id });
+  } catch (err) {
+    console.error('Stripe checkout error:', err.message);
+    res.status(502).json({ message: err.message });
+  }
+});
+
+app.get('/api/payments/stripe/session/:id', verifyToken, async (req, res) => {
+  try {
+    const session = await stripeRequest(`checkout/sessions/${encodeURIComponent(req.params.id)}`);
+    const sameUser = String(session.metadata?.user_id || '') === String(req.user.id);
+    res.json({ paid: sameUser && session.payment_status === 'paid', courseId: session.metadata?.course_id || null });
+  } catch (err) {
+    res.status(502).json({ message: err.message });
+  }
+});
+
 // ─── رفع فيديو ───────────────────────────────────────────────
 app.post('/api/courses/upload', verifyToken, requireAdmin, (req, res, next) => {
   upload.fields([
