@@ -1189,6 +1189,10 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
               <div class="up-label">وصف الفيديو</div>
               <textarea class="up-textarea" id="up-desc" placeholder="اكتب وصفاً للمحتوى ليساعد الطلاب على فهم ما سيتعلمونه..."></textarea>
             </div>
+            <div class="up-field">
+              <div class="up-label">اسم المدرس <span class="req">*</span></div>
+              <input class="up-input" id="up-teacher" type="text" placeholder="اكتب اسم المدرس" oninput="updateInfoCard()">
+            </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
               <div class="up-field" style="margin-bottom:0">
                 <div class="up-label">مدة الفيديو</div>
@@ -1228,6 +1232,9 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
               <div class="up-subject-item" data-subject="تاريخ" data-color="#ef4444" data-emoji="history" onclick="selectSubject(this)">
                 <div class="up-sub-emoji"><svg class="lucide" viewBox="0 0 24 24" style="width:22px;height:22px"><path d="M8 21h12a2 2 0 0 0 2-2v-2H10v2a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v3h4"/><path d="M19 17V5a2 2 0 0 0-2-2H4"/><path d="M15 8H10"/><path d="M15 12H10"/></svg></div><div class="up-sub-name">تاريخ</div>
               </div>
+              <div class="up-subject-item" data-subject="فلسفة" data-color="#8b5cf6" data-emoji="philosophy" onclick="selectSubject(this)">
+                <div class="up-sub-emoji"><svg class="lucide" viewBox="0 0 24 24" style="width:22px;height:22px"><circle cx="12" cy="12" r="9"/><path d="M8 14c1.5 2 6.5 2 8 0M9 9h.01M15 9h.01"/></svg></div><div class="up-sub-name">فلسفة</div>
+              </div>
               <div class="up-subject-item" data-subject="كيمياء" data-color="#06b6d4" data-emoji="chemistry" onclick="selectSubject(this)">
                 <div class="up-sub-emoji"><svg class="lucide" viewBox="0 0 24 24" style="width:22px;height:22px"><path d="M9 3h6l1 9H8L9 3z"/><path d="M6.5 21a5.5 5.5 0 0 0 11 0"/><line x1="3" y1="21" x2="21" y2="21"/></svg></div><div class="up-sub-name">كيمياء</div>
               </div>
@@ -1265,6 +1272,20 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
               <div class="up-dz-sub">MP4 · MKV · AVI · MOV · WEBM — حتى 500MB</div>
             </div>
             <input type="file" id="up-video-input" accept="video/*" style="display:none" onchange="onVideoSelected(this)">
+          </div>
+
+          <!-- Attachments -->
+          <div class="up-card" style="margin-bottom:20px">
+            <div class="up-card-title">
+              <svg class="lucide" viewBox="0 0 24 24" style="width:17px;height:17px"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+              الملفات المرفقة <span style="font-size:12px;color:#aaa;font-weight:500">(اختياري)</span>
+            </div>
+            <div class="up-dropzone" id="up-attachments-drop" onclick="document.getElementById('up-attachments-input').click()">
+              <div class="up-dz-icon"><svg class="lucide" viewBox="0 0 24 24" style="width:36px;height:36px;color:var(--orange)"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="12" y2="12"/><line x1="15" y1="15" x2="12" y2="12"/></svg></div>
+              <div class="up-dz-text" id="up-attachments-name">اضغط لاختيار ملفات الدرس</div>
+              <div class="up-dz-sub">PDF · DOCX · PPTX · XLSX · ZIP — حتى 20 ملفًا</div>
+            </div>
+            <input type="file" id="up-attachments-input" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.jpg,.jpeg,.png,.webp,.txt" style="display:none" onchange="onAttachmentsSelected(this)">
           </div>
 
           <!-- Thumbnail -->
@@ -1317,6 +1338,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
             </div>
             <div class="up-info-box">
               <div class="up-info-row"><span class="up-info-key">العنوان</span><span class="up-info-val" id="info-title" style="max-width:160px;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</span></div>
+              <div class="up-info-row"><span class="up-info-key">المدرس</span><span class="up-info-val" id="info-teacher">—</span></div>
               <div class="up-info-row"><span class="up-info-key">المادة</span><span class="up-info-val" id="info-subject">—</span></div>
               <div class="up-info-row"><span class="up-info-key">المدة</span><span class="up-info-val" id="info-duration">—</span></div>
               <div class="up-info-row"><span class="up-info-key">المستوى</span><span class="up-info-val" id="info-level">—</span></div>
@@ -1506,7 +1528,7 @@ async function loadUploadedCoursesIntoGrid() {
           </div>
           <div class="cg-body">
             <div class="cg-title">${c.title}</div>
-            <div class="cg-teacher"><div class="cg-av" style="background:${c.subject_color || 'var(--navy)'};font-size:13px">${subjectIcon(c.subject_emoji)}</div><span class="cg-tname">${c.description ? c.description.slice(0,40) : 'فيديو تعليمي'}</span></div>
+            <div class="cg-teacher"><div class="cg-av" style="background:${c.subject_color || 'var(--navy)'};font-size:13px">${subjectIcon(c.subject_emoji)}</div><span class="cg-tname">${c.teacher_name || 'فيديو تعليمي'}</span></div>
             <div class="cg-meta"><span><svg class="lucide" viewBox="0 0 24 24" style="width:13px;height:13px;vertical-align:-2px"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> ${c.views || 0} مشاهدة</span>${c.duration ? `<span>${c.duration}</span>` : ''}</div>
             <button class="cg-btn">شاهد الآن</button>
           </div>
@@ -1865,7 +1887,8 @@ const subjectIconMap = {
   physics:   '<svg class="lucide" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-2px"><circle cx="12" cy="12" r="1"/><path d="M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5z"/><path d="M15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5z"/></svg>',
   biology:   '<svg class="lucide" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-2px"><path d="M4.93 4.93a10 10 0 1 0 14.14 14.14M4.93 4.93 19.07 19.07M4.93 4.93a10 10 0 0 1 14.14 0M19.07 19.07a10 10 0 0 1-14.14 0"/></svg>',
   geography: '<svg class="lucide" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-2px"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
-  religion:  '<svg class="lucide" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-2px"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+  religion:  '<svg class="lucide" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-2px"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+  philosophy:'<svg class="lucide" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-2px"><circle cx="12" cy="12" r="9"/><path d="M8 14c1.5 2 6.5 2 8 0"/><circle cx="9" cy="9" r=".5"/><circle cx="15" cy="9" r=".5"/></svg>'
 };
 const defaultVideoIcon = '<svg class="lucide" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-2px"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>';
 function subjectIcon(key) {
@@ -1879,6 +1902,15 @@ function selectSubject(el) {
   document.getElementById('up-subject').value = el.dataset.subject;
   document.getElementById('up-subject-color').value = el.dataset.color;
   document.getElementById('up-subject-emoji').value = el.dataset.emoji;
+  const teacherBySubject = {
+    'لغة عربية': 'محمد فهمي',
+    'لغة إنجليزية': 'سلمى جمعة',
+    'علوم': 'بيتر رضا',
+    'تاريخ': 'إبراهيم الدوسري',
+    'فلسفة': 'علاء الجالي'
+  };
+  const teacher = document.getElementById('up-teacher');
+  if (teacherBySubject[el.dataset.subject] && teacher) teacher.value = teacherBySubject[el.dataset.subject];
   updateInfoCard();
 }
 
@@ -1910,6 +1942,15 @@ function onThumbSelected(input) {
   reader.readAsDataURL(file);
 }
 
+function onAttachmentsSelected(input) {
+  const files = Array.from(input.files || []);
+  const nameEl = document.getElementById('up-attachments-name');
+  const dropEl = document.getElementById('up-attachments-drop');
+  if (!files.length) return;
+  if (nameEl) nameEl.innerHTML = `<div class="up-dz-filename">${files.length} ملف مرفق: ${files.map(file => file.name).join('، ')}</div>`;
+  if (dropEl) dropEl.classList.add('has-file');
+}
+
 // ─── Drag & Drop ─────────────────────────────────────────────────
 function handleVideoDrop(e) {
   e.preventDefault();
@@ -1939,6 +1980,7 @@ function updateInfoCard() {
   const get = id => document.getElementById(id)?.value || '—';
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   set('info-title', get('up-title'));
+  set('info-teacher', get('up-teacher'));
   set('info-subject', get('up-subject'));
   set('info-duration', get('up-duration'));
   set('info-level', get('up-level'));
@@ -1946,16 +1988,19 @@ function updateInfoCard() {
 
 // ─── Reset form ───────────────────────────────────────────────
 function resetUploadForm() {
-  ['up-title','up-desc','up-duration','up-level','up-subject','up-subject-color','up-subject-emoji'].forEach(id => {
+  ['up-title','up-desc','up-teacher','up-duration','up-level','up-subject','up-subject-color','up-subject-emoji'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
   document.getElementById('up-video-input').value = '';
   document.getElementById('up-thumb-input').value = '';
+  document.getElementById('up-attachments-input').value = '';
   document.getElementById('up-video-name').innerHTML = 'اسحب الفيديو هنا أو اضغط للاختيار';
   document.getElementById('up-thumb-name').innerHTML = 'اسحب الصورة هنا أو اضغط للاختيار';
+  document.getElementById('up-attachments-name').innerHTML = 'اضغط لاختيار ملفات الدرس';
   document.getElementById('up-video-drop').classList.remove('has-file');
   document.getElementById('up-thumb-drop').classList.remove('has-file');
+  document.getElementById('up-attachments-drop').classList.remove('has-file');
   const thumbPrev = document.getElementById('up-thumb-preview');
   if (thumbPrev) thumbPrev.style.display = 'none';
   document.querySelectorAll('.up-subject-item').forEach(e => e.classList.remove('selected'));
@@ -1973,12 +2018,14 @@ function resetUploadForm() {
 async function handleUpload() {
   const title    = document.getElementById('up-title').value.trim();
   const desc     = document.getElementById('up-desc').value.trim();
+  const teacher  = document.getElementById('up-teacher').value.trim();
   const duration = document.getElementById('up-duration').value.trim();
   const subject  = document.getElementById('up-subject').value;
   const subColor = document.getElementById('up-subject-color').value;
   const subEmoji = document.getElementById('up-subject-emoji').value;
   const videoFile = document.getElementById('up-video-input').files[0];
   const thumbFile = document.getElementById('up-thumb-input').files[0];
+  const attachmentFiles = Array.from(document.getElementById('up-attachments-input').files || []);
   const msgEl    = document.getElementById('up-msg');
   const btn      = document.getElementById('up-btn');
 
@@ -1990,6 +2037,9 @@ async function handleUpload() {
   if (!subject) {
     msgEl.className='up-status error'; msgEl.innerHTML='<svg class="lucide" viewBox="0 0 24 24" style="width:14px;height:14px;vertical-align:-2px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> يرجى اختيار المادة'; msgEl.style.display='flex'; document.getElementById('up-idle-msg').style.display='none'; return;
   }
+  if (!teacher) {
+    msgEl.className='up-status error'; msgEl.innerHTML='يرجى كتابة اسم المدرس'; msgEl.style.display='flex'; document.getElementById('up-idle-msg').style.display='none'; return;
+  }
   if (!videoFile) {
     msgEl.className='up-status error'; msgEl.innerHTML='<svg class="lucide" viewBox="0 0 24 24" style="width:14px;height:14px;vertical-align:-2px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> يرجى اختيار ملف فيديو'; msgEl.style.display='flex'; document.getElementById('up-idle-msg').style.display='none'; return;
   }
@@ -1997,12 +2047,14 @@ async function handleUpload() {
   const formData = new FormData();
   formData.append('title', title);
   formData.append('description', desc);
+  formData.append('teacher_name', teacher);
   formData.append('duration', duration);
   formData.append('subject', subject);
   formData.append('subject_color', subColor);
   formData.append('subject_emoji', subEmoji);
   formData.append('video', videoFile);
   if (thumbFile) formData.append('thumbnail', thumbFile);
+  attachmentFiles.forEach(file => formData.append('attachments', file));
 
   btn.disabled = true;
   btn.textContent = 'جاري الرفع...';
@@ -2245,6 +2297,8 @@ function playVideo(filename, title, course) {
   if (course) {
     const descEl = document.getElementById('lesson-desc-dynamic');
     if (descEl) descEl.textContent = course.description || descEl.textContent;
+    const teacherEl = document.querySelector('#page-lesson-d .tc-name');
+    if (teacherEl && course.teacher_name) teacherEl.textContent = course.teacher_name;
     const durEl = document.getElementById('lesson-duration-dynamic');
     if (durEl) durEl.textContent = course.duration || durEl.textContent;
     const subjBadge = document.getElementById('lesson-subject-badge');
