@@ -919,6 +919,56 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
 }
 
 /* The catalog is data-driven: show uploaded courses only. */
+.mobile-sidebar-toggle{display:none}
+@media(max-width:700px){
+  .mobile-sidebar-toggle{
+    display:flex!important;
+    position:absolute!important;
+    top:10px!important;
+    left:8px!important;
+    width:28px!important;
+    height:28px!important;
+    align-items:center!important;
+    justify-content:center!important;
+    border:1px solid var(--border)!important;
+    border-radius:7px!important;
+    background:var(--cream)!important;
+    color:var(--navy)!important;
+    font-size:16px!important;
+    font-weight:800!important;
+    cursor:pointer!important;
+    z-index:2!important;
+  }
+  .page:not(#page-landing) .sidebar{padding-top:48px!important}
+  .page:not(#page-landing).mobile-sidebar-collapsed .sidebar{width:48px!important;min-width:48px!important}
+  .page:not(#page-landing).mobile-sidebar-collapsed .main,
+  .page:not(#page-landing).mobile-sidebar-collapsed .up-main{
+    width:calc(100% - 48px)!important;
+    max-width:calc(100% - 48px)!important;
+    margin-right:48px!important;
+  }
+  .page:not(#page-landing).mobile-sidebar-collapsed .sidebar .sb-section,
+  .page:not(#page-landing).mobile-sidebar-collapsed .sidebar .sb-divider,
+  .page:not(#page-landing).mobile-sidebar-collapsed .sidebar .sb-item > span:not(.sb-icon){display:none!important}
+  .page:not(#page-landing).mobile-sidebar-collapsed .sidebar .sb-item{
+    justify-content:center!important;
+    padding:10px 3px!important;
+  }
+  .page:not(#page-landing).mobile-sidebar-collapsed .sidebar .sb-icon{width:auto!important}
+}
+
+/* Use the same collapsible sidebar behavior on desktop and mobile. */
+.mobile-sidebar-toggle{display:flex;position:absolute;top:10px;left:8px;width:28px;height:28px;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:7px;background:var(--cream);color:var(--navy);font-size:16px;font-weight:800;cursor:pointer;z-index:2}
+.page:not(#page-landing) .sidebar{padding-top:48px}
+.page:not(#page-landing).mobile-sidebar-collapsed .sidebar{width:64px;min-width:64px}
+.page:not(#page-landing).mobile-sidebar-collapsed .main,
+.page:not(#page-landing).mobile-sidebar-collapsed .up-main{width:calc(100% - 64px);max-width:calc(100% - 64px);margin-right:64px}
+.page:not(#page-landing).mobile-sidebar-collapsed .sidebar .sb-section,
+.page:not(#page-landing).mobile-sidebar-collapsed .sidebar .sb-divider,
+.page:not(#page-landing).mobile-sidebar-collapsed .sidebar .sb-item > span:not(.sb-icon){display:none}
+.page:not(#page-landing).mobile-sidebar-collapsed .sidebar .sb-item{justify-content:center;padding:10px 3px}
+.page:not(#page-landing).mobile-sidebar-collapsed .sidebar .sb-icon{width:auto}
+
 #page-landing .hc-courses,
 #page-landing .landing-courses-section,
 #page-dashboard .two-col > .card:first-child,
@@ -2769,6 +2819,32 @@ async function handleForgotPassword() {
     msgEl.style.display = 'block';
   }
 }
+</script>
+<script>
+(function setupMobileSidebarToggle(){
+  function init(){
+    document.querySelectorAll('.page:not(#page-landing) .sidebar').forEach(function(sidebar){
+      if (sidebar.querySelector('.mobile-sidebar-toggle')) return;
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'mobile-sidebar-toggle';
+      button.textContent = '›';
+      button.setAttribute('aria-label', 'فتح أو إغلاق القائمة');
+      sidebar.closest('.page').classList.add('mobile-sidebar-collapsed');
+      button.textContent = '‹';
+      button.setAttribute('aria-expanded', 'false');
+      button.addEventListener('click', function(){
+        var page = sidebar.closest('.page');
+        var collapsed = page.classList.toggle('mobile-sidebar-collapsed');
+        button.textContent = collapsed ? '‹' : '›';
+        button.setAttribute('aria-expanded', String(!collapsed));
+      });
+      sidebar.appendChild(button);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
 </script>
 <!-- ─── Forgot Password Popup ─────────────────────────────── -->
 <div id="forgot-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center">
