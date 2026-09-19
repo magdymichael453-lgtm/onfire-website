@@ -616,6 +616,72 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
   }
 }
 
+/* Final mobile sizing pass: keep the header and dashboard inside the viewport. */
+@media(max-width:700px){
+  :root{--topbar-h:124px}
+  body{width:100%;max-width:100%;overflow-x:hidden}
+
+  .topbar{
+    height:var(--topbar-h)!important;
+    min-height:var(--topbar-h)!important;
+    padding:8px 12px 10px!important;
+    display:grid!important;
+    grid-template-columns:auto minmax(0,1fr) auto!important;
+    grid-template-rows:40px 42px!important;
+    gap:6px!important;
+    align-items:center!important;
+    overflow:hidden!important;
+  }
+  .topbar-logo{
+    grid-column:3!important;
+    grid-row:1!important;
+    font-size:17px!important;
+    line-height:1!important;
+    white-space:nowrap!important;
+  }
+  .topbar-logo::before{width:30px!important;height:30px!important;margin-left:5px!important}
+  .topbar-left{
+    grid-column:1!important;
+    grid-row:1!important;
+    margin:0!important;
+    gap:5px!important;
+    min-width:0!important;
+  }
+  .topbar-left .t-avatar{width:32px!important;height:32px!important;font-size:13px!important}
+  .topbar-left .t-lang{padding:5px 8px!important;font-size:12px!important}
+  .topbar-left .t-notif{font-size:18px!important}
+  .topbar-search{
+    grid-column:1 / -1!important;
+    grid-row:2!important;
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    height:40px!important;
+    margin:0!important;
+    padding:7px 10px!important;
+  }
+  .topbar-search input{min-width:0!important;font-size:13px!important}
+
+  .shell{padding-top:var(--topbar-h)!important}
+  .main{padding:18px 12px 28px!important;width:100%!important;min-width:0!important}
+  .page-title{font-size:21px!important;line-height:1.35!important;margin-bottom:3px!important}
+  .page-subtitle{font-size:13px!important;line-height:1.5!important;margin-bottom:16px!important}
+  .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;margin-bottom:18px!important}
+  .stat-card{min-height:142px!important;padding:14px 10px!important;border-radius:12px!important}
+  .sc-icon{font-size:22px!important;margin-bottom:8px!important}
+  .sc-num{font-size:26px!important}
+  .sc-label{font-size:11px!important;line-height:1.45!important}
+  .sc-delta{font-size:11px!important;line-height:1.35!important;margin-top:7px!important}
+  .two-col{gap:14px!important;margin-bottom:18px!important}
+  .card{padding:14px!important;border-radius:12px!important}
+  .card-title{font-size:18px!important;margin-bottom:12px!important}
+  .activity-item{gap:9px!important;padding:9px 0!important}
+  .ac-dot{width:34px!important;height:34px!important;flex:0 0 34px!important}
+  .ac-info{min-width:0!important}
+  .ac-info .ac-text{font-size:12px!important;line-height:1.5!important;overflow-wrap:anywhere}
+  .ac-info .ac-time{font-size:10px!important}
+}
+
 /* The catalog is data-driven: show uploaded courses only. */
 #page-landing .hc-courses,
 #page-landing .landing-courses-section,
