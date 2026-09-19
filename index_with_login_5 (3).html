@@ -680,6 +680,46 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
   .ac-info{min-width:0!important}
   .ac-info .ac-text{font-size:12px!important;line-height:1.5!important;overflow-wrap:anywhere}
   .ac-info .ac-time{font-size:10px!important}
+
+  /* The public landing page has no search row, so it uses a compact header. */
+  #page-landing .topbar{
+    height:72px!important;
+    min-height:72px!important;
+    display:flex!important;
+    grid-template-columns:none!important;
+    grid-template-rows:none!important;
+    padding:8px 12px!important;
+    gap:8px!important;
+    flex-wrap:nowrap!important;
+  }
+  #page-landing .topbar-logo{
+    order:1!important;
+    flex:0 0 auto!important;
+    font-size:17px!important;
+  }
+  #page-landing .topbar-left{
+    order:2!important;
+    margin-right:auto!important;
+    margin-left:0!important;
+    flex:0 0 auto!important;
+  }
+  #page-landing > div[style*="padding-top"]{
+    padding-top:72px!important;
+  }
+  #page-landing .hero-section{
+    width:100%!important;
+    min-height:0!important;
+    padding:28px 14px 34px!important;
+    gap:22px!important;
+  }
+  #page-landing .hero-text,
+  #page-landing .hero-visual{width:100%!important;max-width:100%!important;min-width:0!important}
+  #page-landing .hero-h1{font-size:clamp(28px,8vw,42px)!important;line-height:1.35!important}
+  #page-landing .hero-p{font-size:14px!important;line-height:1.8!important}
+  #page-landing .landing-stats{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  #page-landing .lstat{padding:20px 8px!important}
+  #page-landing .lstat-num{font-size:23px!important}
+  #page-landing .lstat-label{font-size:11px!important}
 }
 
 /* The catalog is data-driven: show uploaded courses only. */
