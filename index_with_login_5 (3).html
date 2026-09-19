@@ -1050,15 +1050,18 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
   .page:not(#page-landing).mobile-sidebar-collapsed .sidebar .sb-item{font-size:0!important}
 
   /* The drawer overlays the page only while open; it never shrinks the layout. */
-  .page:not(#page-landing) .main,
-  .page:not(#page-landing) .up-main,
-  .page:not(#page-landing).mobile-sidebar-collapsed .main,
-  .page:not(#page-landing).mobile-sidebar-collapsed .up-main,
   .page:not(#page-landing):not(.mobile-sidebar-collapsed) .main,
   .page:not(#page-landing):not(.mobile-sidebar-collapsed) .up-main{
     width:100%!important;
     max-width:100%!important;
     margin-right:0!important;
+    margin-left:0!important;
+  }
+  .page:not(#page-landing).mobile-sidebar-collapsed .main,
+  .page:not(#page-landing).mobile-sidebar-collapsed .up-main{
+    width:calc(100% - var(--mobile-sidebar-closed))!important;
+    max-width:calc(100% - var(--mobile-sidebar-closed))!important;
+    margin-right:var(--mobile-sidebar-closed)!important;
     margin-left:0!important;
   }
   .page:not(#page-landing) .sidebar{z-index:300!important}
