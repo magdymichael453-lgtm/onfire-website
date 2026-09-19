@@ -966,8 +966,11 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
 .page:not(#page-landing).mobile-sidebar-collapsed .sidebar .sb-section,
 .page:not(#page-landing).mobile-sidebar-collapsed .sidebar .sb-divider,
 .page:not(#page-landing).mobile-sidebar-collapsed .sidebar .sb-item > span:not(.sb-icon){display:none}
-.page:not(#page-landing).mobile-sidebar-collapsed .sidebar .sb-item{justify-content:center;padding:10px 3px}
-.page:not(#page-landing).mobile-sidebar-collapsed .sidebar .sb-icon{width:auto}
+.page:not(#page-landing).mobile-sidebar-collapsed .sidebar .sb-item{
+  justify-content:center;padding:10px 3px;font-size:0;line-height:1;
+}
+.page:not(#page-landing).mobile-sidebar-collapsed .sidebar .sb-icon{width:auto;font-size:18px;line-height:1}
+.page:not(#page-landing).mobile-sidebar-collapsed .sidebar .sb-badge{font-size:9px;line-height:1;position:absolute;margin:0;transform:translate(15px,-12px);padding:2px 5px}
 
 #page-landing .hc-courses,
 #page-landing .landing-courses-section,
