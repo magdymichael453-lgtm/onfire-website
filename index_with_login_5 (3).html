@@ -978,6 +978,11 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
   display:none!important;
 }
 
+/* Keep the course browser data-driven: hide the old built-in sample cards. */
+#page-courses-d .main > .courses-grid:last-child{
+  display:none!important;
+}
+
 @media(min-width:701px) and (max-width:1100px){
   .main{margin-right:var(--sidebar-w);padding:26px 24px}
 }
