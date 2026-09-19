@@ -974,13 +974,80 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
 
 #page-landing .hc-courses,
 #page-landing .landing-courses-section,
-#page-dashboard .two-col > .card:first-child,
-#page-courses-d .main > .courses-grid{
+#page-dashboard .two-col > .card:first-child{
   display:none!important;
 }
 
 @media(min-width:701px) and (max-width:1100px){
   .main{margin-right:var(--sidebar-w);padding:26px 24px}
+}
+
+/* Canonical responsive layout: one predictable rule for narrow screens. */
+@media(max-width:700px){
+  :root{--mobile-sidebar-open:180px;--mobile-sidebar-closed:48px}
+  html,body{width:100%;min-width:0;max-width:100%;overflow-x:hidden}
+
+  .page:not(#page-landing) .topbar{
+    height:72px!important;
+    min-height:72px!important;
+    padding:8px 8px!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,auto) minmax(72px,1fr) minmax(0,auto)!important;
+    grid-template-rows:56px!important;
+    gap:5px!important;
+    overflow:hidden!important;
+  }
+  .page:not(#page-landing) .topbar-logo{grid-column:1!important;grid-row:1!important;font-size:15px!important;max-width:90px!important}
+  .page:not(#page-landing) .topbar-logo::before{width:26px!important;height:26px!important;margin-left:3px!important}
+  .page:not(#page-landing) .topbar-search{grid-column:2!important;grid-row:1!important;min-width:0!important;width:100%!important;height:38px!important;margin:0!important;padding:6px 7px!important}
+  .page:not(#page-landing) .topbar-search input{min-width:0!important;font-size:10px!important}
+  .page:not(#page-landing) .topbar-left{grid-column:3!important;grid-row:1!important;min-width:0!important;margin:0!important;gap:3px!important}
+  .page:not(#page-landing) .topbar-left .t-avatar{width:31px!important;height:31px!important;font-size:12px!important}
+  .page:not(#page-landing) .topbar-left .t-lang{padding:4px 5px!important;font-size:10px!important}
+  .page:not(#page-landing) .topbar-left .t-notif{font-size:16px!important}
+
+  .page:not(#page-landing) .sidebar,
+  .page:not(#page-landing) .up-shell .sidebar{
+    top:72px!important;
+    right:0!important;
+    bottom:0!important;
+    left:auto!important;
+    width:var(--mobile-sidebar-closed)!important;
+    min-width:var(--mobile-sidebar-closed)!important;
+    height:auto!important;
+    padding:48px 0 10px!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+  }
+  .page:not(#page-landing) .sidebar .mobile-sidebar-toggle{left:10px!important}
+  .page:not(#page-landing):not(.mobile-sidebar-collapsed) .sidebar,
+  .page:not(#page-landing):not(.mobile-sidebar-collapsed) .up-shell .sidebar{
+    width:var(--mobile-sidebar-open)!important;
+    min-width:var(--mobile-sidebar-open)!important;
+  }
+  .page:not(#page-landing) .main,
+  .page:not(#page-landing) .up-main{
+    width:calc(100% - var(--mobile-sidebar-closed))!important;
+    max-width:calc(100% - var(--mobile-sidebar-closed))!important;
+    margin-right:var(--mobile-sidebar-closed)!important;
+    margin-left:0!important;
+    padding:14px 8px 28px!important;
+  }
+  .page:not(#page-landing):not(.mobile-sidebar-collapsed) .main,
+  .page:not(#page-landing):not(.mobile-sidebar-collapsed) .up-main{
+    width:calc(100% - var(--mobile-sidebar-open))!important;
+    max-width:calc(100% - var(--mobile-sidebar-open))!important;
+    margin-right:var(--mobile-sidebar-open)!important;
+  }
+  .page:not(#page-landing) .stats-grid{grid-template-columns:1fr!important;gap:10px!important}
+  .page:not(#page-landing) .two-col,
+  .page:not(#page-landing) .pay-layout,
+  .page:not(#page-landing) .lesson-layout{display:flex!important;flex-direction:column!important;gap:12px!important;width:100%!important;min-width:0!important}
+  .page:not(#page-landing) .card,
+  .page:not(#page-landing) .summary-card,
+  .page:not(#page-landing) .panel{width:100%!important;min-width:0!important;max-width:100%!important;padding:10px!important}
+  .page:not(#page-landing) .sidebar .sb-item{font-size:11px!important}
+  .page:not(#page-landing).mobile-sidebar-collapsed .sidebar .sb-item{font-size:0!important}
 }
 </style>
 </head>
