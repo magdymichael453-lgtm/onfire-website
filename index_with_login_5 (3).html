@@ -240,6 +240,10 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
 .ask-area{background:var(--cream);border-radius:12px;padding:14px;margin-bottom:14px}
 .ask-placeholder{font-size:13px;color:#b0b8c8;margin-bottom:10px}
 .ask-btn{background:var(--navy);color:white;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;font-family:'Tajawal',sans-serif;cursor:pointer}
+#comment-input-d{display:block;width:100%;min-height:84px;box-sizing:border-box;padding:12px 14px;border:1px solid #dfe3ea;border-radius:10px;background:#fff;color:var(--navy);font:400 14px/1.7 'Tajawal',sans-serif;direction:rtl;text-align:right;resize:vertical;outline:none;margin:0 0 10px}
+#comment-input-d:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(30,58,95,.1)}
+#comment-input-d::placeholder{color:#9aa5b8}
+#comment-submit-d{display:block;margin-right:0}
 
 .next-card{background:var(--navy);border-radius:16px;padding:20px}
 /* ─── PLAYLIST ─── */
@@ -1591,7 +1595,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
       <div class="sb-section" data-i18n="sb-main">القائمة الرئيسية</div>
       <div class="sb-item" onclick="setActive(this);showPage('page-dashboard')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span><span data-i18n="sb-dashboard">لوحة التحكم</span></div>
       <div class="sb-item" onclick="setActive(this);showPage('page-courses-d')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span data-i18n="sb-courses">تصفح الدورات</span><span class="sb-badge" id="sb-courses-badge">6</span></div>
-      <div class="sb-item active" onclick="setActive(this);showPage('page-upload')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>رفع فيديو</div>
+      <div class="sb-item active admin-only" onclick="setActive(this);showPage('page-upload')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>رفع فيديو</div>
       <div class="sb-item" onclick="setActive(this);showPage('page-my-videos');loadVideos()"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></span>فيديوهاتي</div>
       <div class="sb-divider"></div>
       <div class="sb-item" style="margin-top:auto" onclick="logoutUser()"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="M9 21H5a2 0 1-2-2V5a2 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg></span><span data-i18n="sb-logout">تسجيل الخروج</span></div>
@@ -1834,7 +1838,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
       <div class="sb-section" data-i18n="sb-main">القائمة الرئيسية</div>
       <div class="sb-item" onclick="setActive(this);showPage('page-dashboard')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span><span data-i18n="sb-dashboard">لوحة التحكم</span></div>
       <div class="sb-item" onclick="setActive(this);showPage('page-courses-d')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span data-i18n="sb-courses">تصفح الدورات</span><span class="sb-badge" id="sb-courses-badge">6</span></div>
-      <div class="sb-item" onclick="setActive(this);showPage('page-upload')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>رفع فيديو</div>
+      <div class="sb-item admin-only" onclick="setActive(this);showPage('page-upload')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>رفع فيديو</div>
       <div class="sb-item active" onclick="setActive(this);showPage('page-my-videos');loadVideos()"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></span>فيديوهاتي</div>
       <div class="sb-divider"></div>
       <div class="sb-item" style="margin-top:auto" onclick="logoutUser()"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="M9 21H5a2 2 2 0 0 1 2-2V5a2 2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg></span><span data-i18n="sb-logout">تسجيل الخروج</span></div>
@@ -2298,7 +2302,10 @@ async function handleLogin() {
       fetch('/api/auth/can-upload', {
         headers: { Authorization: `Bearer ${data.token}` }
       }).then(r => r.ok ? r.json() : null).then(result => {
-        if (result) localStorage.setItem('canUpload', result.canWatchOwned ? 'true' : 'false');
+        if (result) {
+          localStorage.setItem('canUpload', result.canUpload ? 'true' : 'false');
+          localStorage.setItem('canWatchOwned', result.canWatchOwned ? 'true' : 'false');
+        }
       }).catch(() => {});
       document.querySelectorAll('.admin-only').forEach(el => {
         el.style.display = isAdmin ? '' : 'none';
@@ -2328,7 +2335,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
       headers: { Authorization: `Bearer ${savedToken}` }
     }).then(r => r.ok ? r.json() : null).then(result => {
       if (result) {
-        localStorage.setItem('canUpload', result.canWatchOwned ? 'true' : 'false');
+        localStorage.setItem('canUpload', result.canUpload ? 'true' : 'false');
+        localStorage.setItem('canWatchOwned', result.canWatchOwned ? 'true' : 'false');
         document.querySelectorAll('.admin-only').forEach(el => {
           el.style.display = result.canUpload ? '' : 'none';
         });
@@ -2843,7 +2851,6 @@ function continueAfterPayment() {
 
 // ─── Play Video → Open Lesson Page ─────────────────────────────
 function isUploaderAccount() {
-  if (localStorage.getItem('canUpload') === 'true') return true;
   try {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     return ['magdymichael210@gmail.com']
@@ -2862,18 +2869,13 @@ async function hasWatchPermission(course) {
       headers: { Authorization: `Bearer ${token}` }
     });
     const result = response.ok ? await response.json() : null;
-    const allowed = Boolean(result && (result.canWatchOwned || result.canUpload));
-    localStorage.setItem('canUpload', allowed ? 'true' : 'false');
+    const allowed = Boolean(result && result.canWatchOwned);
+    localStorage.setItem('canUpload', result?.canUpload ? 'true' : 'false');
+    localStorage.setItem('canWatchOwned', allowed ? 'true' : 'false');
     if (allowed) return true;
   } catch (_) {}
 
-  try {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    return Boolean(course && user.id && course.instructor_id
-      && String(user.id) === String(course.instructor_id));
-  } catch (_) {
-    return false;
-  }
+  return false;
 }
 
 async function playVideo(filename, title, course) {
