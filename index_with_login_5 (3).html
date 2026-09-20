@@ -1212,7 +1212,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
       <div class="sb-item" onclick="setActive(this)"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span><span data-i18n="sb-notifications">الإشعارات</span></div>
       <div class="sb-item" onclick="setActive(this)"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span data-i18n="sb-settings">الإعدادات</span></div>
       <div class="sb-divider"></div>
-      <div class="sb-item" style="margin-top:auto" onclick="showPage('page-landing')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg></span><span data-i18n="sb-logout">تسجيل الخروج</span></div>
+      <div class="sb-item" style="margin-top:auto" onclick="logoutUser()"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg></span><span data-i18n="sb-logout">تسجيل الخروج</span></div>
     </aside>
     <main class="main">
       <div class="page-title" id="dash-welcome" data-i18n="dash-title">مرحباً، أحمد <svg class="lucide" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-3px"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></div>
@@ -1596,7 +1596,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
       <div class="sb-item active" onclick="setActive(this);showPage('page-upload')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>رفع فيديو</div>
       <div class="sb-item" onclick="setActive(this);showPage('page-my-videos');loadVideos()"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></span>فيديوهاتي</div>
       <div class="sb-divider"></div>
-      <div class="sb-item" style="margin-top:auto" onclick="showPage('page-landing')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg></span><span data-i18n="sb-logout">تسجيل الخروج</span></div>
+      <div class="sb-item" style="margin-top:auto" onclick="logoutUser()"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="M9 21H5a2 0 1-2-2V5a2 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg></span><span data-i18n="sb-logout">تسجيل الخروج</span></div>
     </aside>
     <div class="up-main">
       <!-- Page top bar -->
@@ -1839,7 +1839,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
       <div class="sb-item" onclick="setActive(this);showPage('page-upload')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>رفع فيديو</div>
       <div class="sb-item active" onclick="setActive(this);showPage('page-my-videos');loadVideos()"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></span>فيديوهاتي</div>
       <div class="sb-divider"></div>
-      <div class="sb-item" style="margin-top:auto" onclick="showPage('page-landing')"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg></span><span data-i18n="sb-logout">تسجيل الخروج</span></div>
+      <div class="sb-item" style="margin-top:auto" onclick="logoutUser()"><span class="sb-icon"><svg class="lucide lucide-lg" viewBox="0 0 24 24"><path d="M9 21H5a2 2 2 0 0 1 2-2V5a2 2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg></span><span data-i18n="sb-logout">تسجيل الخروج</span></div>
     </aside>
     <main class="main">
       <div class="page-title" style="display:flex;align-items:center;gap:10px">فيديوهاتي <svg class="lucide" viewBox="0 0 24 24" style="width:22px;height:22px;color:var(--orange)"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg></div>
@@ -2314,7 +2314,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
     fetch('/api/auth/can-upload', {
       headers: { Authorization: `Bearer ${savedToken}` }
     }).then(r => r.ok ? r.json() : null).then(result => {
-      if (result) localStorage.setItem('canUpload', result.canWatchOwned ? 'true' : 'false');
+      if (result) {
+        localStorage.setItem('canUpload', result.canWatchOwned ? 'true' : 'false');
+        document.querySelectorAll('.admin-only').forEach(el => {
+          el.style.display = result.canUpload ? '' : 'none';
+        });
+      }
     }).catch(() => {});
   }
   const paymentButton = document.querySelector('#page-payment-d .pay-final-btn');
@@ -2340,6 +2345,14 @@ document.addEventListener('DOMContentLoaded', ()=>{
     })
     .catch(()=>{});
 });
+
+function logoutUser() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  localStorage.removeItem('canUpload');
+  document.querySelectorAll('.admin-only').forEach(el => { el.style.display = 'none'; });
+  showPage('page-landing');
+}
 
 // ─── Subject Icon Map (SVG instead of emoji) ───────────────────
 const subjectIconMap = {
