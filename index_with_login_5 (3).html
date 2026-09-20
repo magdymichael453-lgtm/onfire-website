@@ -2286,7 +2286,7 @@ async function handleLogin() {
       const nameEl = document.getElementById('user-name-topbar');
       if (nameEl) nameEl.textContent = firstName;
       // إظهار أو إخفاء زرار رفع الفيديو حسب الـ admin
-      const isAdmin = ['magdymichael210@gmail.com', 'magdymichael523@gmail.com']
+      const isAdmin = ['magdymichael210@gmail.com']
         .includes(String(data.user.email || '').trim().toLowerCase());
       localStorage.setItem('canUpload', isAdmin ? 'true' : 'false');
       fetch('/api/auth/can-upload', {
@@ -2744,7 +2744,7 @@ function isUploaderAccount() {
   if (localStorage.getItem('canUpload') === 'true') return true;
   try {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    return ['magdymichael210@gmail.com', 'magdymichael523@gmail.com']
+    return ['magdymichael210@gmail.com']
       .includes(String(user.email || '').trim().toLowerCase());
   } catch (_) {
     return false;
