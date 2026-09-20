@@ -2305,6 +2305,9 @@ async function handleLogin() {
       document.querySelectorAll('.admin-only').forEach(el => {
         el.style.display = isAdmin ? '' : 'none';
       });
+      document.querySelectorAll('[onclick*="page-upload"]').forEach(el => {
+        el.style.display = isAdmin ? '' : 'none';
+      });
       showPage('page-dashboard');
     }
   } catch (e) {
@@ -2325,6 +2328,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
       if (result) {
         localStorage.setItem('canUpload', result.canWatchOwned ? 'true' : 'false');
         document.querySelectorAll('.admin-only').forEach(el => {
+          el.style.display = result.canUpload ? '' : 'none';
+        });
+        document.querySelectorAll('[onclick*="page-upload"]').forEach(el => {
           el.style.display = result.canUpload ? '' : 'none';
         });
       }
@@ -2358,7 +2364,7 @@ function logoutUser() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
   localStorage.removeItem('canUpload');
-  document.querySelectorAll('.admin-only').forEach(el => { el.style.display = 'none'; });
+  document.querySelectorAll('.admin-only, [onclick*="page-upload"]').forEach(el => { el.style.display = 'none'; });
   showPage('page-landing');
 }
 
