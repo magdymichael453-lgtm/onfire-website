@@ -532,8 +532,35 @@ app.post('/api/courses/:id/view', async (req, res) => {
   res.json({ ok: true });
 });
 
+// ─── ترقية قاعدة البيانات ───────────────────────────────────
+// يحافظ هذا الفحص على توافق قاعدة البيانات القديمة مع نموذج رفع الفيديو.
+async function ensureCourseSchema() {
+  const databaseName = process.env.DB_NAME || process.env.MYSQLDATABASE || 'onfire_db';
+  const [columns] = await db.query(
+    `SELECT 1
+       FROM information_schema.columns
+      WHERE table_schema = ?
+        AND table_name = 'courses'
+        AND column_name = 'teacher_name'
+      LIMIT 1`,
+    [databaseName]
+  );
+
+  if (!columns.length) {
+    await db.query('ALTER TABLE courses ADD COLUMN teacher_name VARCHAR(150) NULL AFTER description');
+    console.log('✅ تمت إضافة courses.teacher_name تلقائياً');
+  }
+}
+
 // ─── تشغيل السيرفر ───────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`✅ السيرفر شغال على http://localhost:${PORT}`);
-});
+ensureCourseSchema()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`✅ السيرفر شغال على http://localhost:${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.error('❌ تعذر تجهيز قاعدة البيانات:', err.code, err.message);
+    process.exit(1);
+  });
