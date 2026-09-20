@@ -412,6 +412,7 @@ app.get('/api/courses', async (req, res) => {
   try {
     const [rows] = await db.query(
       `SELECT c.id, c.title, c.description, c.teacher_name, c.video_filename, c.thumbnail, c.duration,
+              c.instructor_id,
               c.subject, c.subject_color, c.subject_emoji, c.views, c.created_at,
               u.full_name AS instructor_name
        FROM courses c LEFT JOIN users u ON u.id = c.instructor_id
@@ -427,6 +428,7 @@ app.get('/api/courses/mine', verifyToken, requireAdmin, async (req, res) => {
   try {
     const [rows] = await db.query(
       `SELECT c.id, c.title, c.description, c.teacher_name, c.video_filename, c.thumbnail, c.duration,
+              c.instructor_id,
               c.subject, c.subject_color, c.subject_emoji, c.views, c.created_at,
               u.full_name AS instructor_name
        FROM courses c LEFT JOIN users u ON u.id = c.instructor_id

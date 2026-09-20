@@ -2753,7 +2753,11 @@ function isUploaderAccount() {
 
 function playVideo(filename, title, course) {
   // course param optional (full course object) for richer info
-  if (course && !paymentUnlocked && !isUploaderAccount()) {
+  let currentUser = {};
+  try { currentUser = JSON.parse(localStorage.getItem('user') || '{}'); } catch (_) {}
+  const ownsCourse = course && currentUser.id && course.instructor_id
+    && String(currentUser.id) === String(course.instructor_id);
+  if (course && !paymentUnlocked && !isUploaderAccount() && !ownsCourse) {
     openCoursePayment(course);
     return;
   }
