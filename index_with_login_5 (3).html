@@ -2751,15 +2751,37 @@ function isUploaderAccount() {
   }
 }
 
-function playVideo(filename, title, course) {
+async function hasWatchPermission(course) {
+  if (isUploaderAccount()) return true;
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) return false;
+    const response = await fetch('/api/auth/can-upload', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const result = response.ok ? await response.json() : null;
+    const allowed = Boolean(result && (result.canWatchOwned || result.canUpload));
+    localStorage.setItem('canUpload', allowed ? 'true' : 'false');
+    if (allowed) return true;
+  } catch (_) {}
+
+  try {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    return Boolean(course && user.id && course.instructor_id
+      && String(user.id) === String(course.instructor_id));
+  } catch (_) {
+    return false;
+  }
+}
+
+async function playVideo(filename, title, course) {
   // course param optional (full course object) for richer info
-  let currentUser = {};
-  try { currentUser = JSON.parse(localStorage.getItem('user') || '{}'); } catch (_) {}
-  const ownsCourse = course && currentUser.id && course.instructor_id
-    && String(currentUser.id) === String(course.instructor_id);
-  if (course && !paymentUnlocked && !isUploaderAccount() && !ownsCourse) {
-    openCoursePayment(course);
-    return;
+  if (course && !paymentUnlocked) {
+    const allowed = await hasWatchPermission(course);
+    if (!allowed) {
+      openCoursePayment(course);
+      return;
+    }
   }
   paymentUnlocked = false;
   const player = document.getElementById('lesson-video-player');
