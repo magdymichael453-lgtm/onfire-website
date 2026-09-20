@@ -920,6 +920,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
 
 /* The catalog is data-driven: show uploaded courses only. */
 .mobile-sidebar-toggle{display:none}
+.delete-video-btn{display:none}
 @media(max-width:700px){
   .mobile-sidebar-toggle{
     display:flex!important;
@@ -1381,12 +1382,9 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
           </div>
 
           <div class="desc-block">
-            <h3 data-i18n="discussions-title">النقاشات والاستفسارات (24)</h3>
-            <div class="ask-area"><div class="ask-placeholder" data-i18n="ask-placeholder">لديك سؤال؟ اطرحه هنا...</div><button class="ask-btn" data-i18n="ask-btn">إرسال التعليق</button></div>
-            <div class="comment-list">
-              <div class="cm"><div class="cm-av" style="background:#3498db">أ</div><div class="cm-body"><div class="cm-meta"><span class="cm-name">أحمد خالد</span><span class="cm-time">منذ ساعتين</span></div><div class="cm-text">هل يمكننا استخدام الآلة الحاسبة في حل هذه النوعية من المعادلات في الاختبار النهائي؟</div></div></div>
-              <div class="cm"><div class="cm-av" style="background:var(--navy)">م</div><div class="cm-body"><div class="cm-meta"><span class="cm-name">أ. محمد العتيبي</span><span class="cm-badge">مدرس</span><span class="cm-time">منذ ساعة</span></div><div class="cm-text reply">أهلاً بك يا أحمد، نعم، مسموح بالآلة الحاسبة العلمية فقط، ولكن من الضروري إظهار خطوات الحل كاملة.</div></div></div>
-            </div>
+            <h3 id="discussions-title-d">النقاشات والاستفسارات (0)</h3>
+            <div class="ask-area"><textarea id="comment-input-d" class="ask-placeholder" placeholder="لديك سؤال؟ اطرحه هنا..." rows="2"></textarea><button id="comment-submit-d" class="ask-btn" type="button">إرسال التعليق</button></div>
+            <div id="comments-list-d" class="comment-list"><div style="text-align:center;color:#aaa;padding:16px">لا توجد تعليقات بعد</div></div>
           </div>
         </div>
 
@@ -2308,6 +2306,9 @@ async function handleLogin() {
       document.querySelectorAll('[onclick*="page-upload"]').forEach(el => {
         el.style.display = isAdmin ? '' : 'none';
       });
+      document.querySelectorAll('.delete-video-btn').forEach(el => {
+        el.style.display = isAdmin ? 'block' : 'none';
+      });
       showPage('page-dashboard');
     }
   } catch (e) {
@@ -2320,6 +2321,7 @@ async function handleLogin() {
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('comment-submit-d')?.addEventListener('click', submitRealComment);
   const savedToken = localStorage.getItem('token');
   if (savedToken) {
     fetch('/api/auth/can-upload', {
@@ -2332,6 +2334,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
         });
         document.querySelectorAll('[onclick*="page-upload"]').forEach(el => {
           el.style.display = result.canUpload ? '' : 'none';
+        });
+        document.querySelectorAll('.delete-video-btn').forEach(el => {
+          el.style.display = result.canUpload ? 'block' : 'none';
         });
       }
     }).catch(() => {});
@@ -2650,6 +2655,7 @@ async function loadVideos() {
           <div style="font-weight:700;font-size:15px;color:#1e3a5f;margin-bottom:6px">${c.title}</div>
           <div style="font-size:12px;color:#888">${c.description || ''}</div>
           <div style="font-size:12px;color:#aaa;margin-top:8px;display:flex;align-items:center;gap:4px"><svg class="lucide" viewBox="0 0 24 24" style="width:13px;height:13px"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> ${c.views} مشاهدة</div>
+          <button type="button" class="delete-video-btn" onclick="event.stopPropagation();deleteVideo(${c.id})" style="display:${isUploaderAccount() ? 'block' : 'none'};margin-top:12px;width:100%;border:1px solid #fecaca;background:#fff1f2;color:#dc2626;border-radius:8px;padding:8px;font-family:inherit;font-weight:700;cursor:pointer">حذف الفيديو</button>
         </div>
       </div>
     `).join('');
@@ -2659,9 +2665,73 @@ async function loadVideos() {
   }
 }
 
+async function deleteVideo(courseId) {
+  if (!confirm('هل أنت متأكد من حذف هذا الفيديو وجميع ملفاته؟')) return;
+  const token = localStorage.getItem('token');
+  if (!token) return alert('سجّل الدخول أولاً');
+  try {
+    const response = await fetch(`${API}/courses/${courseId}`, {
+      method: 'DELETE', headers: { Authorization: `Bearer ${token}` }
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'تعذر حذف الفيديو');
+    await loadVideos();
+  } catch (err) { alert(err.message); }
+}
+
 let pendingCourse = null;
 let paymentUnlocked = false;
 let paymentDiscount = 0;
+let activeCommentCourseId = null;
+
+function escapeCommentHtml(value) {
+  return String(value || '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+function formatCommentTime(value) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? '' : date.toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' });
+}
+
+async function loadRealComments(courseId) {
+  activeCommentCourseId = courseId;
+  const list = document.getElementById('comments-list-d');
+  const title = document.getElementById('discussions-title-d');
+  if (!list || !courseId) return;
+  list.innerHTML = '<div style="text-align:center;color:#aaa;padding:16px">جاري تحميل التعليقات...</div>';
+  try {
+    const response = await fetch(`${API}/courses/${courseId}/comments`);
+    const comments = response.ok ? await response.json() : [];
+    if (title) title.textContent = `النقاشات والاستفسارات (${comments.length})`;
+    list.innerHTML = comments.length ? comments.map(comment => `
+      <div class="cm"><div class="cm-av" style="background:var(--navy)">${escapeCommentHtml((comment.author_name || '?').trim().charAt(0))}</div>
+        <div class="cm-body"><div class="cm-meta"><span class="cm-name">${escapeCommentHtml(comment.author_name || 'مستخدم')}</span><span class="cm-time">${escapeCommentHtml(formatCommentTime(comment.created_at))}</span></div>
+        <div class="cm-text">${escapeCommentHtml(comment.body)}</div></div></div>`).join('') : '<div style="text-align:center;color:#aaa;padding:16px">لا توجد تعليقات بعد</div>';
+  } catch (_) {
+    list.innerHTML = '<div style="text-align:center;color:#ef4444;padding:16px">تعذر تحميل التعليقات</div>';
+  }
+}
+
+async function submitRealComment() {
+  const input = document.getElementById('comment-input-d');
+  const button = document.getElementById('comment-submit-d');
+  const body = String(input?.value || '').trim();
+  if (!activeCommentCourseId) return;
+  if (!body) return alert('اكتب التعليق أولاً');
+  const token = localStorage.getItem('token');
+  if (!token) return alert('سجّل الدخول لإضافة تعليق');
+  if (button) { button.disabled = true; button.textContent = 'جاري الإرسال...'; }
+  try {
+    const response = await fetch(`${API}/courses/${activeCommentCourseId}/comments`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ body })
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'تعذر إرسال التعليق');
+    input.value = '';
+    await loadRealComments(activeCommentCourseId);
+  } catch (err) { alert(err.message); }
+  finally { if (button) { button.disabled = false; button.textContent = 'إرسال التعليق'; } }
+}
 
 function updatePaymentSummary() {
   const price = 299;
@@ -2836,6 +2906,7 @@ async function playVideo(filename, title, course) {
       if (course.subject_color) subjBadge.style.background = course.subject_color;
     }
     loadLessonAttachments(course.id);
+    loadRealComments(course.id);
   }
 
   showPage('page-lesson-d');
