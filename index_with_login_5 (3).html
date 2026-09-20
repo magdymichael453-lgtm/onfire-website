@@ -2309,6 +2309,14 @@ async function handleLogin() {
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
+  const savedToken = localStorage.getItem('token');
+  if (savedToken) {
+    fetch('/api/auth/can-upload', {
+      headers: { Authorization: `Bearer ${savedToken}` }
+    }).then(r => r.ok ? r.json() : null).then(result => {
+      if (result) localStorage.setItem('canUpload', result.canUpload ? 'true' : 'false');
+    }).catch(() => {});
+  }
   const paymentButton = document.querySelector('#page-payment-d .pay-final-btn');
   if (paymentButton) paymentButton.onclick = completePayment;
   const continueButton = document.querySelector('#page-success-d .btn-suc.primary');
