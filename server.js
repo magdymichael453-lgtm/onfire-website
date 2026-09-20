@@ -5,6 +5,7 @@ const cors    = require('cors');
 const multer  = require('multer');
 const path    = require('path');
 const fs      = require('fs');
+const crypto  = require('crypto');
 if (process.env.NODE_ENV !== 'production') require('dotenv').config();
 
 const db  = require('./db');
@@ -424,6 +425,40 @@ app.get('/api/courses', async (req, res) => {
   }
 });
 
+// روابط QR محدودة المشاهدة
+app.post('/api/courses/:id/qr-access', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const courseId = Number(req.params.id);
+    const [courses] = await db.query('SELECT id, title FROM courses WHERE id = ?', [courseId]);
+    if (!courses.length) return res.status(404).json({ message: 'الفيديو غير موجود' });
+    const token = crypto.randomBytes(24).toString('hex');
+    await db.query('INSERT INTO qr_access_tokens (token, course_id, max_views, views_count) VALUES (?, ?, 10, 0)', [token, courseId]);
+    const origin = process.env.PUBLIC_URL || `${req.headers['x-forwarded-proto'] || req.protocol}://${req.get('host')}`;
+    res.json({ ok: true, title: courses[0].title, url: `${origin}/?qr=${token}` });
+  } catch (err) {
+    console.error('QR create error:', err.message);
+    res.status(500).json({ message: 'تعذر إنشاء QR للفيديو' });
+  }
+});
+
+app.get('/api/qr/:token', async (req, res) => {
+  const token = String(req.params.token || '').trim();
+  if (!token) return res.status(400).json({ message: 'رابط QR غير صالح' });
+  try {
+    const [updated] = await db.query('UPDATE qr_access_tokens SET views_count = views_count + 1 WHERE token = ? AND views_count < max_views', [token]);
+    if (!updated.affectedRows) return res.status(410).json({ message: 'انتهت المشاهدات المسموحة لهذا QR' });
+    const [rows] = await db.query(`SELECT c.id, c.title, c.description, c.teacher_name, c.video_filename, c.thumbnail,
+              c.duration, c.subject, c.subject_color, c.subject_emoji, c.views
+         FROM qr_access_tokens q JOIN courses c ON c.id = q.course_id
+        WHERE q.token = ? LIMIT 1`, [token]);
+    if (!rows.length) return res.status(404).json({ message: 'الفيديو غير موجود' });
+    res.json({ ok: true, course: rows[0] });
+  } catch (err) {
+    console.error('QR access error:', err.message);
+    res.status(500).json({ message: 'تعذر فتح الفيديو' });
+  }
+});
+
 app.get('/api/courses/mine', verifyToken, requireAdmin, async (req, res) => {
   try {
     const [rows] = await db.query(
@@ -552,6 +587,16 @@ async function ensureCourseSchema() {
     await db.query('ALTER TABLE courses ADD COLUMN teacher_name VARCHAR(150) NULL AFTER description');
     console.log('✅ تمت إضافة courses.teacher_name تلقائياً');
   }
+
+  await db.query(`CREATE TABLE IF NOT EXISTS qr_access_tokens (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    token VARCHAR(64) NOT NULL UNIQUE,
+    course_id INT NOT NULL,
+    max_views INT NOT NULL DEFAULT 10,
+    views_count INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_qr_course (course_id)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`);
 }
 
 // ─── تشغيل السيرفر ───────────────────────────────────────────

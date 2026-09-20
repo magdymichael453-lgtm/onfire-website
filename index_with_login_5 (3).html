@@ -2373,6 +2373,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   if (staticPrice) staticPrice.textContent = '٢٩٩ جنيه مصري / سنوياً';
   updatePaymentSummary();
   verifyStripeReturn();
+  openQrVideo();
   document.querySelectorAll('.t-lang').forEach(btn=>{
     btn.addEventListener('click', toggleLang);
   });
@@ -2386,6 +2387,23 @@ document.addEventListener('DOMContentLoaded', ()=>{
     })
     .catch(()=>{});
 });
+
+async function openQrVideo() {
+  const token = new URLSearchParams(window.location.search).get('qr');
+  if (!token) return;
+  try {
+    const response = await fetch(`${API}/qr/${encodeURIComponent(token)}`);
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'تعذر فتح رابط الفيديو');
+    const course = result.course;
+    qrVideoUnlocked = true;
+    showPage('page-lesson-d');
+    await playVideo(course.video_filename, course.title, course);
+    history.replaceState({}, '', `${window.location.pathname}#page-lesson-d`);
+  } catch (err) {
+    alert(err.message);
+  }
+}
 
 function logoutUser() {
   localStorage.removeItem('token');
@@ -2680,6 +2698,7 @@ async function loadVideos() {
           <div style="font-size:12px;color:#888">${c.description || ''}</div>
           <div style="font-size:12px;color:#aaa;margin-top:8px;display:flex;align-items:center;gap:4px"><svg class="lucide" viewBox="0 0 24 24" style="width:13px;height:13px"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> ${c.views} مشاهدة</div>
           <button type="button" class="delete-video-btn" onclick="event.stopPropagation();deleteVideo(${c.id})" style="display:${isUploaderAccount() ? 'block' : 'none'};margin-top:12px;width:100%;border:1px solid #fecaca;background:#fff1f2;color:#dc2626;border-radius:8px;padding:8px;font-family:inherit;font-weight:700;cursor:pointer">حذف الفيديو</button>
+          <button type="button" class="qr-video-btn" onclick="event.stopPropagation();generateVideoQr(${c.id})" style="display:${isUploaderAccount() ? 'block' : 'none'};margin-top:8px;width:100%;border:1px solid #c7d2fe;background:#eef2ff;color:#1e3a5f;border-radius:8px;padding:8px;font-family:inherit;font-weight:700;cursor:pointer">إنشاء QR لـ 10 مشاهدين</button>
         </div>
       </div>
     `).join('');
@@ -2703,8 +2722,32 @@ async function deleteVideo(courseId) {
   } catch (err) { alert(err.message); }
 }
 
+async function generateVideoQr(courseId) {
+  const token = localStorage.getItem('token');
+  if (!token) return alert('سجّل الدخول أولاً');
+  const qrWindow = window.open('', '_blank');
+  try {
+    const response = await fetch(`${API}/courses/${courseId}/qr-access`, {
+      method: 'POST', headers: { Authorization: `Bearer ${token}` }
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'تعذر إنشاء QR');
+    const imageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=320x320&data=${encodeURIComponent(result.url)}`;
+    if (qrWindow) {
+      qrWindow.document.write(`<title>QR - ${result.title || 'الفيديو'}</title><body style="font-family:Arial;text-align:center;padding:24px"><h2>${result.title || 'الفيديو'}</h2><img src="${imageUrl}" alt="QR Code"><p>يسمح لأول 10 مشاهدات فقط</p><p style="word-break:break-all">${result.url}</p></body>`);
+      qrWindow.document.close();
+    } else {
+      prompt('رابط مشاهدة الفيديو لأول 10 أشخاص:', result.url);
+    }
+  } catch (err) {
+    if (qrWindow) qrWindow.close();
+    alert(err.message);
+  }
+}
+
 let pendingCourse = null;
 let paymentUnlocked = false;
+let qrVideoUnlocked = false;
 let paymentDiscount = 0;
 let activeCommentCourseId = null;
 
@@ -2896,7 +2939,7 @@ async function hasWatchPermission(course) {
 
 async function playVideo(filename, title, course) {
   // course param optional (full course object) for richer info
-  if (course && !paymentUnlocked) {
+  if (course && !paymentUnlocked && !qrVideoUnlocked) {
     const allowed = await hasWatchPermission(course);
     if (!allowed) {
       openCoursePayment(course);
@@ -2904,6 +2947,7 @@ async function playVideo(filename, title, course) {
     }
   }
   paymentUnlocked = false;
+  qrVideoUnlocked = false;
   const player = document.getElementById('lesson-video-player');
   const empty  = document.getElementById('lesson-video-empty');
   if (player) {
