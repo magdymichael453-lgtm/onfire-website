@@ -2292,7 +2292,7 @@ async function handleLogin() {
       fetch('/api/auth/can-upload', {
         headers: { Authorization: `Bearer ${data.token}` }
       }).then(r => r.ok ? r.json() : null).then(result => {
-        if (result) localStorage.setItem('canUpload', result.canUpload ? 'true' : 'false');
+        if (result) localStorage.setItem('canUpload', result.canWatchOwned ? 'true' : 'false');
       }).catch(() => {});
       document.querySelectorAll('.admin-only').forEach(el => {
         el.style.display = isAdmin ? '' : 'none';
@@ -2314,7 +2314,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     fetch('/api/auth/can-upload', {
       headers: { Authorization: `Bearer ${savedToken}` }
     }).then(r => r.ok ? r.json() : null).then(result => {
-      if (result) localStorage.setItem('canUpload', result.canUpload ? 'true' : 'false');
+      if (result) localStorage.setItem('canUpload', result.canWatchOwned ? 'true' : 'false');
     }).catch(() => {});
   }
   const paymentButton = document.querySelector('#page-payment-d .pay-final-btn');

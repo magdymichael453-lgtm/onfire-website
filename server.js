@@ -200,10 +200,17 @@ function requireAdmin(req, res, next) {
   next();
 }
 
-app.get('/api/auth/can-upload', verifyToken, (req, res) => {
-  res.json({
-    canUpload: adminEmails.has(String(req.user?.email || '').trim().toLowerCase())
-  });
+app.get('/api/auth/can-upload', verifyToken, async (req, res) => {
+  try {
+    const isAdmin = adminEmails.has(String(req.user?.email || '').trim().toLowerCase());
+    const [ownedCourses] = await db.query(
+      'SELECT id FROM courses WHERE instructor_id = ? LIMIT 1',
+      [req.user.id]
+    );
+    res.json({ canUpload: isAdmin, canWatchOwned: isAdmin || ownedCourses.length > 0 });
+  } catch (err) {
+    res.status(500).json({ message: 'تعذر التحقق من صلاحية الحساب' });
+  }
 });
 
 // ─── Stripe Checkout ─────────────────────────────────────────
