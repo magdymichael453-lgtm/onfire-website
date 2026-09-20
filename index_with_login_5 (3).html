@@ -2760,6 +2760,11 @@ function applyPaymentCoupon() {
 }
 
 function openCoursePayment(course) {
+  if (isUploaderAccount()) {
+    paymentUnlocked = true;
+    playVideo(course?.video_filename, course?.title, course);
+    return;
+  }
   pendingCourse = course || null;
   const price = 299;
   const titleEl = document.querySelector('#page-payment-d .plan-name-big');
