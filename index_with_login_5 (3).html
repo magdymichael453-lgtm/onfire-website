@@ -984,6 +984,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
 }
 
 /* Keep the course browser data-driven: hide the old built-in sample cards. */
+.admin-only{display:none}
 #page-courses-d .main > .courses-grid:last-child{
   display:none!important;
 }
@@ -2387,6 +2388,7 @@ function logoutUser() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
   localStorage.removeItem('canUpload');
+  localStorage.removeItem('canWatchOwned');
   document.querySelectorAll('.admin-only, [onclick*="page-upload"]').forEach(el => { el.style.display = 'none'; });
   showPage('page-landing');
 }
