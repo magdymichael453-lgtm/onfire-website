@@ -985,6 +985,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
 
 /* Keep the course browser data-driven: hide the old built-in sample cards. */
 .admin-only{display:none}
+body.is-admin .page:not(#page-landing) .sidebar .admin-only{display:flex!important}
 #page-courses-d .main > .courses-grid:last-child{
   display:none!important;
 }
@@ -2309,6 +2310,7 @@ async function handleLogin() {
       // إظهار أو إخفاء زرار رفع الفيديو حسب الـ admin
       const isAdmin = ['magdymichael210@gmail.com']
         .includes(String(data.user.email || '').trim().toLowerCase());
+      document.body.classList.toggle('is-admin', isAdmin);
       localStorage.setItem('canUpload', isAdmin ? 'true' : 'false');
       fetch('/api/auth/can-upload', {
         headers: { Authorization: `Bearer ${data.token}` }
@@ -2319,10 +2321,10 @@ async function handleLogin() {
         }
       }).catch(() => {});
       document.querySelectorAll('.admin-only').forEach(el => {
-        el.style.display = isAdmin ? '' : 'none';
+        el.style.display = isAdmin ? 'flex' : 'none';
       });
       document.querySelectorAll('[onclick*="page-upload"]').forEach(el => {
-        el.style.display = isAdmin ? '' : 'none';
+        el.style.display = isAdmin ? 'flex' : 'none';
       });
       document.querySelectorAll('.delete-video-btn').forEach(el => {
         el.style.display = isAdmin ? 'block' : 'none';
@@ -2346,13 +2348,14 @@ document.addEventListener('DOMContentLoaded', ()=>{
       headers: { Authorization: `Bearer ${savedToken}` }
     }).then(r => r.ok ? r.json() : null).then(result => {
       if (result) {
+        document.body.classList.toggle('is-admin', Boolean(result.canUpload));
         localStorage.setItem('canUpload', result.canUpload ? 'true' : 'false');
         localStorage.setItem('canWatchOwned', result.canWatchOwned ? 'true' : 'false');
         document.querySelectorAll('.admin-only').forEach(el => {
-          el.style.display = result.canUpload ? '' : 'none';
+          el.style.display = result.canUpload ? 'flex' : 'none';
         });
         document.querySelectorAll('[onclick*="page-upload"]').forEach(el => {
-          el.style.display = result.canUpload ? '' : 'none';
+          el.style.display = result.canUpload ? 'flex' : 'none';
         });
         document.querySelectorAll('.delete-video-btn').forEach(el => {
           el.style.display = result.canUpload ? 'block' : 'none';
@@ -2389,6 +2392,7 @@ function logoutUser() {
   localStorage.removeItem('user');
   localStorage.removeItem('canUpload');
   localStorage.removeItem('canWatchOwned');
+  document.body.classList.remove('is-admin');
   document.querySelectorAll('.admin-only, [onclick*="page-upload"]').forEach(el => { el.style.display = 'none'; });
   showPage('page-landing');
 }
