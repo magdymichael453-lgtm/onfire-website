@@ -2348,17 +2348,18 @@ document.addEventListener('DOMContentLoaded', ()=>{
       headers: { Authorization: `Bearer ${savedToken}` }
     }).then(r => r.ok ? r.json() : null).then(result => {
       if (result) {
-        document.body.classList.toggle('is-admin', Boolean(result.canUpload));
-        localStorage.setItem('canUpload', result.canUpload ? 'true' : 'false');
+        const localAdmin = isUploaderAccount();
+        document.body.classList.toggle('is-admin', localAdmin);
+        localStorage.setItem('canUpload', localAdmin ? 'true' : 'false');
         localStorage.setItem('canWatchOwned', result.canWatchOwned ? 'true' : 'false');
         document.querySelectorAll('.admin-only').forEach(el => {
-          el.style.display = result.canUpload ? 'flex' : 'none';
+          el.style.display = localAdmin ? 'flex' : 'none';
         });
         document.querySelectorAll('[onclick*="page-upload"]').forEach(el => {
-          el.style.display = result.canUpload ? 'flex' : 'none';
+          el.style.display = localAdmin ? 'flex' : 'none';
         });
         document.querySelectorAll('.delete-video-btn').forEach(el => {
-          el.style.display = result.canUpload ? 'block' : 'none';
+          el.style.display = localAdmin ? 'block' : 'none';
         });
       }
     }).catch(() => {});
