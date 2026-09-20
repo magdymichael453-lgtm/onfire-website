@@ -1468,7 +1468,7 @@ body{font-family:'Tajawal',sans-serif;background:var(--cream);color:var(--text);
             <div class="sum-title" data-i18n="sum-title">ملخص السعر</div>
             <div class="sum-row"><span class="sl" data-i18n="sum-sub">المجموع الفرعي</span><span class="sv">٢٩٩.٠٠ ر.س</span></div>
             <div class="sum-row"><span class="sl" data-i18n="sum-disc">الخصم</span><span class="disc">٠.٠٠ - ر.س</span></div>
-            <div class="sum-row"><span class="sl" data-i18n="sum-tax">ضريبة القيمة المضافة (١٥٪)</span><span class="sv">٤٤.٨٥ ر.س</span></div>
+            <div class="sum-row" style="display:none"><span class="sl" data-i18n="sum-tax">ضريبة القيمة المضافة (١٥٪)</span><span class="sv">٠.٠٠ ر.س</span></div>
             <div class="sum-divider"></div>
             <div class="sum-total"><span class="tl" data-i18n="sum-total">الإجمالي</span><span class="tv">٣٤٣.٨٥ ر.س</span></div>
             <div class="secure-row" data-i18n="pay-secure"><svg class="lucide" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> دفع آمن ومشفر ١٠٠٪</div>
@@ -2288,6 +2288,12 @@ async function handleLogin() {
       // إظهار أو إخفاء زرار رفع الفيديو حسب الـ admin
       const isAdmin = ['magdymichael210@gmail.com', 'magdymichael523@gmail.com']
         .includes(String(data.user.email || '').trim().toLowerCase());
+      localStorage.setItem('canUpload', isAdmin ? 'true' : 'false');
+      fetch('/api/auth/can-upload', {
+        headers: { Authorization: `Bearer ${data.token}` }
+      }).then(r => r.ok ? r.json() : null).then(result => {
+        if (result) localStorage.setItem('canUpload', result.canUpload ? 'true' : 'false');
+      }).catch(() => {});
       document.querySelectorAll('.admin-only').forEach(el => {
         el.style.display = isAdmin ? '' : 'none';
       });
@@ -2626,7 +2632,7 @@ function updatePaymentSummary() {
   const price = 299;
   const discount = price * paymentDiscount;
   const subtotal = price - discount;
-  const tax = subtotal * 0.15;
+  const tax = 0;
   const subtotalEl = document.querySelector('#page-payment-d .summary-card .sum-row:nth-child(2) .sv');
   const discountEl = document.querySelector('#page-payment-d .summary-card .sum-row:nth-child(3) .disc');
   const taxEl = document.querySelector('#page-payment-d .summary-card .sum-row:nth-child(4) .sv');
@@ -2658,7 +2664,7 @@ function openCoursePayment(course) {
   const taxEl = document.querySelector('#page-payment-d .summary-card .sum-row:nth-child(4) .sv');
   const totalEl = document.querySelector('#page-payment-d .summary-card .tv');
   const title = course && course.title ? course.title : 'الفيديو التعليمي';
-  const tax = price * 0.15;
+  const tax = 0;
   if (titleEl) titleEl.textContent = `اشتراك الفيديو: ${title}`;
   if (descEl) descEl.textContent = 'ادفع الاشتراك للوصول إلى هذا الفيديو وجميع الملفات التعليمية المرتبطة به';
   if (priceEl) priceEl.textContent = `${price} جنيه مصري / سنوياً`;
@@ -2726,9 +2732,20 @@ function continueAfterPayment() {
 }
 
 // ─── Play Video → Open Lesson Page ─────────────────────────────
+function isUploaderAccount() {
+  if (localStorage.getItem('canUpload') === 'true') return true;
+  try {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    return ['magdymichael210@gmail.com', 'magdymichael523@gmail.com']
+      .includes(String(user.email || '').trim().toLowerCase());
+  } catch (_) {
+    return false;
+  }
+}
+
 function playVideo(filename, title, course) {
   // course param optional (full course object) for richer info
-  if (course && !paymentUnlocked) {
+  if (course && !paymentUnlocked && !isUploaderAccount()) {
     openCoursePayment(course);
     return;
   }
