@@ -1953,7 +1953,7 @@ function showPage(id, { fromHistory = false } = {}){
   if (id === 'page-lesson-d') {
     const currentSrc = document.getElementById('lesson-video-player')?.src || '';
     const currentFile = currentSrc.split('/uploads/')[1] || null;
-    loadPlaylist(currentFile);
+    loadPlaylist(currentFile, activePlaylistTeacher);
   }
   if (id === 'page-courses-d') {
     loadUploadedCoursesIntoGrid();
@@ -2672,6 +2672,8 @@ async function handleUpload() {
 
 // ─── Load Videos ──────────────────────────────────────────────
 let loadedVideosCache = [];
+let playlistVideosCache = [];
+let activePlaylistTeacher = null;
 async function loadVideos() {
   const grid = document.getElementById('videos-grid');
   grid.innerHTML = '<div style="text-align:center;color:#888;padding:40px;grid-column:1/-1">جاري التحميل...</div>';
@@ -2967,6 +2969,7 @@ async function playVideo(filename, title, course) {
   if (titleEl) titleEl.textContent = title || titleEl.textContent;
 
   if (course) {
+    activePlaylistTeacher = course.teacher_name || null;
     const descEl = document.getElementById('lesson-desc-dynamic');
     if (descEl) descEl.textContent = course.description || descEl.textContent;
     const teacherEl = document.querySelector('#page-lesson-d .tc-name');
@@ -2991,7 +2994,7 @@ async function playVideo(filename, title, course) {
   }
 
   // Load / refresh playlist and highlight current video
-  loadPlaylist(filename);
+  loadPlaylist(filename, activePlaylistTeacher);
 }
 
 function escapeHtml(value) {
@@ -3023,25 +3026,37 @@ async function loadLessonAttachments(courseId) {
 }
 
 // ─── Playlist in lesson page ───────────────────────────────────
-async function loadPlaylist(activeFilename) {
+async function loadPlaylist(activeFilename, teacherName = null) {
   const listEl  = document.getElementById('playlist-list');
   const countEl = document.getElementById('playlist-count');
   if (!listEl) return;
 
-  let courses = loadedVideosCache;
-  if (!courses || courses.length === 0) {
+  let allCourses = loadedVideosCache;
+  if (!allCourses || allCourses.length === 0) {
     try {
       const res = await fetch(`${API}/courses`);
-      courses = await res.json();
-      loadedVideosCache = courses;
+      allCourses = await res.json();
+      loadedVideosCache = allCourses;
     } catch (e) {
       listEl.innerHTML = '<div style="text-align:center;color:#ef4444;font-size:13px;padding:20px 0">تعذر تحميل القائمة</div>';
       return;
     }
   }
 
-  if (!courses || courses.length === 0) {
+  if (!allCourses || allCourses.length === 0) {
     listEl.innerHTML = '<div style="text-align:center;color:#aaa;font-size:13px;padding:20px 0">لا توجد فيديوهات بعد</div>';
+    if (countEl) countEl.textContent = '';
+    return;
+  }
+
+  const wantedTeacher = String(teacherName || '').trim();
+  const courses = wantedTeacher
+    ? allCourses.filter(course => String(course.teacher_name || '').trim() === wantedTeacher)
+    : allCourses;
+  playlistVideosCache = courses;
+
+  if (courses.length === 0) {
+    listEl.innerHTML = '<div style="text-align:center;color:#aaa;font-size:13px;padding:20px 0">لا توجد فيديوهات لهذا المدرس</div>';
     if (countEl) countEl.textContent = '';
     return;
   }
@@ -3055,7 +3070,7 @@ async function loadPlaylist(activeFilename) {
       : subjectIcon(c.subject_emoji);
     return `
       <div class="pl-item${isActive ? ' active' : ''}" data-filename="${c.video_filename}"
-        onclick="playVideo('${c.video_filename}','${(c.title||'').replace(/'/g,"\\'")}', loadedVideosCache[${idx}])">
+        onclick="playVideo('${c.video_filename}','${(c.title||'').replace(/'/g,"\\'")}', playlistVideosCache[${idx}])">
         <div class="pl-num">${isActive ? '▶' : idx + 1}</div>
         <div class="pl-thumb">${thumbHtml}${isActive ? '<div class="pl-playing">يُعرض الآن</div>' : ''}</div>
         <div class="pl-info">
