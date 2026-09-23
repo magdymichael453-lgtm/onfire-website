@@ -80,29 +80,30 @@ app.get('/api/test', async (req, res) => {
 // ─── تسجيل مستخدم جديد ───────────────────────────────────────
 app.post('/api/register', async (req, res) => {
   const { full_name, email, password } = req.body;
+  const normalizedEmail = String(email || '').trim().toLowerCase();
   console.log('📥 Register request:', { full_name, email });
 
-  if (!full_name || !email || !password)
+  if (!full_name || !normalizedEmail || !password)
     return res.status(400).json({ message: 'جميع الحقول مطلوبة' });
 
   if (password.length < 6)
     return res.status(400).json({ message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' });
 
   try {
-    const [existing] = await db.query('SELECT id FROM users WHERE email = ?', [email]);
+    const [existing] = await db.query('SELECT id FROM users WHERE LOWER(TRIM(email)) = ?', [normalizedEmail]);
     if (existing.length > 0)
       return res.status(409).json({ message: 'البريد الإلكتروني مسجل مسبقاً' });
 
     const hashed = await bcrypt.hash(password, 10);
     const [result] = await db.query(
       'INSERT INTO users (full_name, email, password) VALUES (?, ?, ?)',
-      [full_name, email, hashed]
+      [full_name, normalizedEmail, hashed]
     );
 
     console.log('✅ User created:', result.insertId);
     res.status(201).json({
       message: 'تم إنشاء الحساب بنجاح. يمكنك تسجيل الدخول الآن.',
-      user: { id: result.insertId, full_name, email }
+      user: { id: result.insertId, full_name, email: normalizedEmail }
     });
 
   } catch (err) {
@@ -114,13 +115,14 @@ app.post('/api/register', async (req, res) => {
 // ─── تسجيل الدخول ────────────────────────────────────────────
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
-  console.log('📥 Login request:', { email });
+  const normalizedEmail = String(email || '').trim().toLowerCase();
+  console.log('📥 Login request:', { email: normalizedEmail });
 
-  if (!email || !password)
+  if (!normalizedEmail || !password)
     return res.status(400).json({ message: 'جميع الحقول مطلوبة' });
 
   try {
-    const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+    const [rows] = await db.query('SELECT * FROM users WHERE LOWER(TRIM(email)) = ? LIMIT 1', [normalizedEmail]);
     if (rows.length === 0)
       return res.status(401).json({ message: 'البريد الإلكتروني أو كلمة المرور غير صحيحة' });
 
@@ -151,20 +153,21 @@ app.post('/api/login', async (req, res) => {
 // ─── إعادة تعيين كلمة المرور ─────────────────────────────────
 app.post('/api/reset-password', async (req, res) => {
   const { email, password } = req.body;
+  const normalizedEmail = String(email || '').trim().toLowerCase();
 
-  if (!email || !password)
+  if (!normalizedEmail || !password)
     return res.status(400).json({ message: 'جميع الحقول مطلوبة' });
 
   if (password.length < 6)
     return res.status(400).json({ message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' });
 
   try {
-    const [existing] = await db.query('SELECT id FROM users WHERE email = ?', [email]);
+    const [existing] = await db.query('SELECT id FROM users WHERE LOWER(TRIM(email)) = ?', [normalizedEmail]);
     if (existing.length === 0)
       return res.status(404).json({ message: 'البريد الإلكتروني غير مسجل' });
 
     const hashed = await bcrypt.hash(password, 10);
-    await db.query('UPDATE users SET password = ? WHERE email = ?', [hashed, email]);
+    await db.query('UPDATE users SET password = ? WHERE LOWER(TRIM(email)) = ?', [hashed, normalizedEmail]);
 
     res.json({ message: 'تم تغيير كلمة المرور بنجاح' });
   } catch (err) {
