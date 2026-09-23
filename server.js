@@ -425,16 +425,18 @@ app.get('/api/courses', async (req, res) => {
   }
 });
 
-// روابط QR محدودة المشاهدة
+// إنشاء 30 رابط QR للفيديو، وكل رابط يسمح بـ 3 مشاهدات
 app.post('/api/courses/:id/qr-access', verifyToken, requireAdmin, async (req, res) => {
   try {
     const courseId = Number(req.params.id);
     const [courses] = await db.query('SELECT id, title FROM courses WHERE id = ?', [courseId]);
     if (!courses.length) return res.status(404).json({ message: 'الفيديو غير موجود' });
-    const token = crypto.randomBytes(24).toString('hex');
-    await db.query('INSERT INTO qr_access_tokens (token, course_id, max_views, views_count) VALUES (?, ?, 10, 0)', [token, courseId]);
+    const tokens = Array.from({ length: 30 }, () => crypto.randomBytes(24).toString('hex'));
+    await Promise.all(tokens.map(token =>
+      db.query('INSERT INTO qr_access_tokens (token, course_id, max_views, views_count) VALUES (?, ?, 3, 0)', [token, courseId])
+    ));
     const origin = process.env.PUBLIC_URL || `${req.headers['x-forwarded-proto'] || req.protocol}://${req.get('host')}`;
-    res.json({ ok: true, title: courses[0].title, url: `${origin}/?qr=${token}` });
+    res.json({ ok: true, title: courses[0].title, urls: tokens.map(token => `${origin}/?qr=${token}`) });
   } catch (err) {
     console.error('QR create error:', err.message);
     res.status(500).json({ message: 'تعذر إنشاء QR للفيديو' });
@@ -592,11 +594,12 @@ async function ensureCourseSchema() {
     id INT AUTO_INCREMENT PRIMARY KEY,
     token VARCHAR(64) NOT NULL UNIQUE,
     course_id INT NOT NULL,
-    max_views INT NOT NULL DEFAULT 10,
+    max_views INT NOT NULL DEFAULT 3,
     views_count INT NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_qr_course (course_id)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`);
+  await db.query('UPDATE qr_access_tokens SET max_views = 3, views_count = LEAST(views_count, 3)');
 }
 
 // ─── تشغيل السيرفر ───────────────────────────────────────────
