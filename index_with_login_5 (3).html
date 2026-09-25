@@ -1935,7 +1935,7 @@ function showPage(id, { fromHistory = false } = {}){
   if (id === 'page-upload') {
     let email = '';
     try { email = String(JSON.parse(localStorage.getItem('user') || '{}').email || '').trim().toLowerCase(); } catch (_) {}
-    if (email !== 'magdymichael210@gmail.com') {
+    if (email !== 'magdymichael210@gmail.com' && localStorage.getItem('canUpload') !== 'true') {
       showPage(localStorage.getItem('token') ? 'page-dashboard' : 'page-landing', { fromHistory });
       return;
     }
@@ -2348,7 +2348,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
       headers: { Authorization: `Bearer ${savedToken}` }
     }).then(r => r.ok ? r.json() : null).then(result => {
       if (result) {
-        const localAdmin = isUploaderAccount();
+        // The server response is authoritative after a page refresh.
+        const localAdmin = result.canUpload === true;
         document.body.classList.toggle('is-admin', localAdmin);
         localStorage.setItem('canUpload', localAdmin ? 'true' : 'false');
         localStorage.setItem('canWatchOwned', result.canWatchOwned ? 'true' : 'false');
