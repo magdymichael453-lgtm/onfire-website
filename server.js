@@ -18,8 +18,8 @@ const adminEmails = new Set(['magdymichael210@gmail.com']);
 const uploadsDir = path.join(__dirname, 'uploads');
 const thumbsDir  = path.join(__dirname, 'uploads', 'thumbnails');
 const attachmentsDir = path.join(__dirname, 'uploads', 'attachments');
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
-if (!fs.existsSync(thumbsDir))  fs.mkdirSync(thumbsDir);
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+if (!fs.existsSync(thumbsDir))  fs.mkdirSync(thumbsDir, { recursive: true });
 if (!fs.existsSync(attachmentsDir)) fs.mkdirSync(attachmentsDir, { recursive: true });
 
 // ─── Multer Config ────────────────────────────────────────────
@@ -329,6 +329,12 @@ app.post('/api/courses/upload', verifyToken, requireAdmin, (req, res, next) => {
       course: { id: result.insertId, title, video: videoFile.filename, thumbnail: thumbFile?.filename || null }
     });
   } catch (err) {
+    // Remove files already written when the database insert fails.
+    for (const file of [videoFile, thumbFile, ...attachmentFiles]) {
+      if (file?.path && fs.existsSync(file.path)) {
+        try { fs.unlinkSync(file.path); } catch (_) {}
+      }
+    }
     console.error('❌ Upload Error:', err.message);
     res.status(500).json({ message: 'خطأ في قاعدة البيانات: ' + err.message });
   }
@@ -609,9 +615,13 @@ async function ensureCourseSchema() {
 const PORT = process.env.PORT || 3000;
 ensureCourseSchema()
   .then(() => {
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
       console.log(`✅ السيرفر شغال على http://localhost:${PORT}`);
     });
+    // Video uploads can be large and legitimately take several minutes.
+    server.requestTimeout = 0;
+    server.timeout = 0;
+    server.keepAliveTimeout = 120000;
   })
   .catch(err => {
     console.error('❌ تعذر تجهيز قاعدة البيانات:', err.code, err.message);
