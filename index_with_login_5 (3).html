@@ -1375,7 +1375,7 @@ body.is-admin .page:not(#page-landing) .sidebar .admin-only{display:flex!importa
             <div class="lesson-title-big" id="lesson-title-dynamic" data-i18n="lesson-title">مقدمة في الجبر: المفاهيم الأساسية والمعادلات</div>
             <div class="teacher-card-row">
               <div class="tc-av">م</div>
-              <div><div class="tc-name" data-i18n="lesson-teacher-name">أ. محمد العتيبي</div><div class="tc-exp" data-i18n="lesson-teacher-exp">خبير في تعليم الرياضيات · 15 عام خبرة</div></div>
+              <div><div class="tc-name" data-i18n="lesson-teacher-name">أ. محمد العتيبي</div><div class="tc-exp" id="lesson-teacher-exp-dynamic" data-i18n="lesson-teacher-exp">خبير في تعليم المادة · 15 عام خبرة</div></div>
             </div>
             <div class="lesson-meta-row">
               <div class="lm"><svg class="lucide" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span id="lesson-duration-dynamic">45 دقيقة</span></div>
@@ -2996,6 +2996,8 @@ async function playVideo(filename, title, course) {
     if (descEl) descEl.textContent = course.description || descEl.textContent;
     const teacherEl = document.querySelector('#page-lesson-d .tc-name');
     if (teacherEl && course.teacher_name) teacherEl.textContent = course.teacher_name;
+    const teacherExpEl = document.getElementById('lesson-teacher-exp-dynamic');
+    if (teacherExpEl && course.subject) teacherExpEl.textContent = `خبير في تعليم ${course.subject} · 15 عام خبرة`;
     const durEl = document.getElementById('lesson-duration-dynamic');
     if (durEl) durEl.textContent = course.duration || durEl.textContent;
     const subjBadge = document.getElementById('lesson-subject-badge');
